@@ -1,0 +1,87 @@
+{
+  "version": "1.0",
+  "description": "Roadmaps for learning popular programming languages",
+  "roadmaps": {
+    "Python": {
+      "level": "beginner_to_advanced",
+      "steps": [
+        "Basics: syntax, variables, data types",
+        "Control flow: if/else, loops",
+        "Functions and modules",
+        "Data structures: lists, dicts, sets, tuples",
+        "OOP: classes and objects",
+        "File handling",
+        "Error handling",
+        "Libraries: requests, numpy, pandas",
+        "Web development: Flask or Django",
+        "Automation & scripting projects",
+        "Advanced: decorators, generators, concurrency",
+        "Testing and deployment"
+      ]
+    },
+    "JavaScript": {
+      "level": "beginner_to_advanced",
+      "steps": [
+        "Basics: syntax, variables, data types",
+        "DOM manipulation",
+        "Functions and scope",
+        "ES6+ features",
+        "Asynchronous JS: promises, async/await",
+        "APIs and fetch",
+        "Frontend frameworks: React or Vue",
+        "State management",
+        "Backend with Node.js",
+        "Databases: MongoDB or SQL",
+        "Testing and tooling",
+        "Deployment"
+      ]
+    },
+    "Java": {
+      "level": "beginner_to_advanced",
+      "steps": [
+        "Syntax and basics",
+        "OOP fundamentals",
+        "Collections framework",
+        "Exception handling",
+        "File I/O",
+        "Multithreading",
+        "JVM understanding",
+        "Spring framework basics",
+        "REST APIs",
+        "Databases integration",
+        "Testing (JUnit)",
+        "Build tools: Maven/Gradle"
+      ]
+    },
+    "C++": {
+      "level": "beginner_to_advanced",
+      "steps": [
+        "Syntax and basics",
+        "Pointers and memory management",
+        "OOP concepts",
+        "STL (Standard Template Library)",
+        "File handling",
+        "Algorithms and problem solving",
+        "Advanced C++ features",
+        "Multithreading",
+        "System design basics",
+        "Competitive programming practice"
+      ]
+    },
+    "Go": {
+      "level": "beginner_to_advanced",
+      "steps": [
+        "Syntax and basics",
+        "Structs and interfaces",
+        "Concurrency with goroutines",
+        "Channels",
+        "Error handling",
+        "Packages and modules",
+        "Web servers with net/http",
+        "Microservices basics",
+        "Testing",
+        "Deployment and Docker"
+      ]
+    }
+  }
+}
