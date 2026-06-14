@@ -1,6 +1,18 @@
 from openai import OpenAI
+import json
 
 answerDone = False
+jsonRoadmapFile = "roadmap.json"
+
+
+def roadmapExtract(language):
+    with open(jsonRoadmapFile, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    steps = data["roadmaps"][language]["steps"]
+    for step in steps:
+        print(step)
+
 
 while answerDone == False:
     user_input = input("What do you want to learn and plan today? ")
@@ -53,19 +65,19 @@ while answerDone == False:
     language = answer.strip()
 
     if language.lower() == "python":
-        print("Ok lets start with learning python")
+        roadmapExtract(language.lower())
         answerDone = True
     elif language.lower() == "javascript":
-        print("Ok lets start with learning JavaScript")
+        roadmapExtract(language.lower())
         answerDone = True
     elif language.lower() == "java":
-        print("Ok lets start with learning Java")
+        roadmapExtract(language.lower())
         answerDone = True
     elif language.lower() == "c++":
-        print("Ok lets start with learning C++")
+        roadmapExtract(language.lower())
         answerDone = True
     elif language.lower() == "go":
-        print("Ok lets start with learning Go")
+        roadmapExtract(language.lower())
         answerDone = True
     else:
-        print(language)
+        print(answer)

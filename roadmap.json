@@ -2,7 +2,7 @@
   "version": "1.0",
   "description": "Roadmaps for learning popular programming languages",
   "roadmaps": {
-    "Python": {
+    "python": {
       "level": "beginner_to_advanced",
       "steps": [
         "Basics: syntax, variables, data types",
@@ -19,7 +19,7 @@
         "Testing and deployment"
       ]
     },
-    "JavaScript": {
+    "javaScript": {
       "level": "beginner_to_advanced",
       "steps": [
         "Basics: syntax, variables, data types",
@@ -36,7 +36,7 @@
         "Deployment"
       ]
     },
-    "Java": {
+    "java": {
       "level": "beginner_to_advanced",
       "steps": [
         "Syntax and basics",
@@ -53,7 +53,7 @@
         "Build tools: Maven/Gradle"
       ]
     },
-    "C++": {
+    "c++": {
       "level": "beginner_to_advanced",
       "steps": [
         "Syntax and basics",
@@ -68,7 +68,7 @@
         "Competitive programming practice"
       ]
     },
-    "Go": {
+    "go": {
       "level": "beginner_to_advanced",
       "steps": [
         "Syntax and basics",
