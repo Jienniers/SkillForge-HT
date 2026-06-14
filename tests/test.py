@@ -13,26 +13,29 @@ def generate_answer(prompt):
             {
                 "role": "system",
                 "content": (
-                    "You are a strict programming intent classifier.\n"
-                    "You MUST follow the rules in order. If multiple rules apply, choose ONLY the first matching rule.\n\n"
-                    "RULE 1: If the user is NOT asking to learn anything related to programming (or is asking about anything unrelated like cooking, music, jokes, general questions, greetings), respond EXACTLY:\n"
-                    "I cannot help with anything unrelated to programming.\n\n"
-                    "RULE 2: If the user IS asking to learn something, but it is NOT related to programming, respond EXACTLY:\n"
-                    "I cannot help with anything unrelated to programming.\n\n"
-                    "RULE 3: If the user IS asking to learn programming BUT does NOT specify a programming language, respond EXACTLY:\n"
+                    "You are a strict programming language extractor.\n"
+                    "Your ONLY job is to detect and output a programming language if present.\n"
+                    "Do NOT interpret intent. Do NOT ask questions. Do NOT respond conversationally.\n"
+                    "Do NOT decide whether the user is 'asking to learn' or not.\n\n"
+                    "RULE 1: If ANY programming language is mentioned in the user message, respond with ONLY the language name.\n"
+                    "Ignore all other words in the message.\n\n"
+                    "RULE 2: If NO programming language is mentioned, respond EXACTLY:\n"
                     "I get you want to learn programming but what programming language do you want to learn.\n\n"
-                    "IMPORTANT FOR RULE 3:\n"
-                    "- 'Teach me programming', 'I want to learn programming', 'Help me learn programming' ALL count as missing language.\n\n"
-                    "RULE 4: If the user clearly specifies a programming language, respond with ONLY the language name.\n"
-                    "No punctuation, no explanation, no extra words.\n\n"
+                    "RULE 3: If the message contains NO programming context at all (e.g. greetings, cooking, music, jokes), respond EXACTLY:\n"
+                    "I cannot help with anything unrelated to programming.\n\n"
+                    "IMPORTANT RULES:\n"
+                    "- Language detection ALWAYS has highest priority.\n"
+                    "- Even if the user says extra words like 'teach me', 'how to learn', 'just tell me', ignore them.\n"
+                    "- If a language appears anywhere, output ONLY that language.\n\n"
                     "Examples:\n"
                     "User: hello -> I cannot help with anything unrelated to programming.\n"
                     "User: I want to learn cooking -> I cannot help with anything unrelated to programming.\n"
                     "User: teach me guitar -> I cannot help with anything unrelated to programming.\n"
                     "User: I want to learn programming -> I get you want to learn programming but what programming language do you want to learn.\n"
+                    "User: I want to learn Python -> Python\n"
                     "User: Teach me Python -> Python\n"
-                    "User: I want to learn JavaScript -> JavaScript\n"
-                    "User: I want to learn Go programming -> Go\n"
+                    "User: then just tell me how to learn python -> Python\n"
+                    "User: I want python and javascript -> Python\n"
                 ),
             },
             {
@@ -94,6 +97,14 @@ test_cases = [
     (
         "Hello there",
         "I cannot help with anything unrelated to programming.",
+    ),
+    (
+        "then just tell me how to learn python",
+        "Python",
+    ),
+    (
+        "I want to learn programming and its python then just tell me how to learn python",
+        "Python",
     ),
 ]
 
