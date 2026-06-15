@@ -8,6 +8,67 @@ USE_BREAKS = True
 languages = {"1": "Python", "2": "JavaScript", "3": "Java"}
 
 
+PRACTICE_SYSTEM_PROMPT = """
+You are an expert Python programming tutor and coding assessment generator.
+
+You will be given a 30-day learning plan in JSON format.
+Each day contains one or more programming topics.
+
+Your task is to generate PRACTICAL CODING EXERCISES ONLY.
+
+CRITICAL RULE:
+You MUST strictly follow the structure of the input plan.
+Do NOT move topics between days.
+Do NOT merge or shuffle days.
+Each day must only use its own topics.
+
+TASK:
+For each topic in each day:
+Generate exactly 3 PRACTICAL CODING QUESTIONS.
+
+QUESTION RULES:
+- ALL questions must be coding-based (no theory-only questions)
+- Each question must require writing actual code
+- No explanations, no definitions, no conceptual questions
+- No pseudo questions like "What is Flask?"
+- Instead ask: "Write a Flask app that..."
+
+QUESTION STYLE:
+1. Easy → small code snippet task
+2. Medium → function/class implementation
+3. Hard → mini real-world program or feature
+
+EXAMPLES OF GOOD QUESTIONS:
+- "Write a Python function that reverses a list without using built-in reverse()"
+- "Create a Flask API with one GET endpoint returning JSON"
+- "Write a script that reads a file and counts word frequency"
+
+OUTPUT FORMAT (STRICT JSON ONLY):
+
+{
+  "day_1": {
+    "topic_name": [
+      "coding question 1",
+      "coding question 2",
+      "coding question 3"
+    ]
+  }
+}
+
+RULES:
+- Output ONLY valid JSON
+- No explanations
+- No markdown
+- No extra text
+- Every topic MUST have exactly 3 coding questions
+- Must follow original day order exactly
+- No topic merging or skipping
+- All questions MUST require writing code
+
+Now generate coding practice questions for the provided plan.
+"""
+
+
 def generate_answer(prompt, promptStructure):
     client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
@@ -38,6 +99,7 @@ def createPlan(roadmap, USE_BREAKS):
 
     PLAN = f"""
     You are an expert programming curriculum designer.
+    THIS IS A HARD CONSTRAINT SYSTEM. YOU MUST FOLLOW ALL BOOLEAN FLAGS EXACTLY. NO EXCEPTIONS.
 
     Your task is to convert a list of learning roadmap steps into a structured 30-day learning plan.
 
@@ -74,16 +136,18 @@ def createPlan(roadmap, USE_BREAKS):
     8. Web frameworks (Flask/Django) (must take multiple days)
     9. Projects & practice days
 
-    BREAK RULE (VERY IMPORTANT):
-    - If USE_BREAKS is true:
-        - Include exactly 1 rest day every 5–7 learning days
-        - Rest days MUST be spread out across the plan
-        - NEVER place all rest days at the end
-        - Rest days must be between learning days (natural spacing)
-        - Rest day format: ["rest"]
+    BREAK RULE (ABSOLUTE PRIORITY):
 
     - If USE_BREAKS is false:
-        - No rest days allowed
+        - YOU ARE STRICTLY FORBIDDEN from adding ANY rest day.
+        - EVEN IF spacing feels uneven.
+        - EVEN IF roadmap feels dense.
+        - Rest days do NOT exist in this mode under any circumstance.
+
+    - If USE_BREAKS is true:
+        - You MAY include rest days
+        - Maximum: 3 rest days total
+        - Must be evenly distributed
 
     ANTI-SPEEDRUN RULE:
     - Do NOT compress multiple topics just to finish early
@@ -118,6 +182,8 @@ def createPlan(roadmap, USE_BREAKS):
     answer = generate_answer(roadmap_text, PLAN)
     print(f"Your 30-days Plan is following:\n{answer}")
 
+    return answer
+
 
 def userChoice():
     choice = ""
@@ -144,4 +210,26 @@ USE_BREAKS = breaks == "y"
 
 roadmap = roadmapExtract(languages[choice].lower())
 
-createPlan(roadmap, USE_BREAKS)
+wholePlan = createPlan(roadmap, USE_BREAKS)
+
+print(
+    f"Your 30-day plan for learning {languages[choice]} is ready. Check it out above."
+)
+
+print("Your practice questions are also ready. Check them out below.")
+
+PracticeQuestions = generate_answer(json.dumps(wholePlan), PRACTICE_SYSTEM_PROMPT)
+
+PracticeQuestions = json.loads(PracticeQuestions)
+
+print(json.dumps(PracticeQuestions, indent=4))
+
+while True:
+    print("Do you want to extract any day question?")
+    day = input("Enter the day number (1-30): ")
+
+    if day.isdigit():
+        day = int(day)
+
+        if 1 <= day <= 30:
+            print(PracticeQuestions[f"day_{day}"])
