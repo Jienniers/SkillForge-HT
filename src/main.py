@@ -1,72 +1,11 @@
 from openai import OpenAI
 import json
 
-answerDone = False
-jsonRoadmapFile = "roadmap.json"
+jsonRoadmapFile = "./roadmap.json"
 
-STARTING_PROMPT = """ You are a strict programming language extractor.\n"
-    "Your ONLY job is to detect and output a programming language if present.\n"
-    "Do NOT interpret intent. Do NOT ask questions. Do NOT respond conversationally.\n"
-    "Do NOT decide whether the user is 'asking to learn' or not.\n\n"
-    "RULE 1: If ANY programming language is mentioned in the user message, respond with ONLY the language name.\n"
-    "Ignore all other words in the message.\n\n"
-    "RULE 2: If NO programming language is mentioned, respond EXACTLY:\n"
-    "I get you want to learn programming but what programming language do you want to learn.\n\n"
-    "RULE 3: If the message contains NO programming context at all (e.g. greetings, cooking, music, jokes), respond EXACTLY:\n"
-    "I cannot help with anything unrelated to programming.\n\n"
-    "IMPORTANT RULES:\n"
-    "- Language detection ALWAYS has highest priority.\n"
-    "- Even if the user says extra words like 'teach me', 'how to learn', 'just tell me', ignore them.\n"
-    "- If a language appears anywhere, output ONLY that language.\n\n"
-    "Examples:\n"
-    "User: hello -> I cannot help with anything unrelated to programming.\n"
-    "User: I want to learn cooking -> I cannot help with anything unrelated to programming.\n"
-    "User: teach me guitar -> I cannot help with anything unrelated to programming.\n"
-    "User: I want to learn programming -> I get you want to learn programming but what programming language do you want to learn.\n"
-    "User: I want to learn Python -> Python\n"
-    "User: Teach me Python -> Python\n"
-    "User: then just tell me how to learn python -> Python\n"
-    "User: I want python and javascript -> Python\n", """
+USE_BREAKS = True
 
-
-PLAN = """ You are an expert programming curriculum designer.\n"
-    "Your task is to convert a list of learning roadmap steps into a structured 30-day learning plan.\n\n"
-    "INPUT:\n"
-    "You will receive an array of topics (roadmap steps).\n\n"
-    "TASK:\n"
-    "1. Analyze all topics.\n"
-    "2. Sort them from easiest to hardest based on typical beginner learning difficulty.\n"
-    "3. Distribute them into a 30-day learning plan.\n"
-    "4. Each day should contain 1–3 topics depending on difficulty.\n"
-    "5. Ensure progressive learning (no advanced topic before basics).\n\n"
-    "OUTPUT FORMAT (STRICT JSON ONLY):\n"
-    "{\n"
-    '  "day_1": ["topic1", "topic2"],\n'
-    '  "day_2": ["topic3"],\n'
-    "  ...\n"
-    '  "day_30": ["topicN"]\n'
-    "}\n\n"
-    "RULES:\n"
-    "- Do NOT include explanations.\n"
-    "- Do NOT include markdown.\n"
-    "- Do NOT add extra text.\n"
-    "- Always return exactly 30 days (day_1 to day_30).\n"
-    "- If topics are few, distribute them evenly across 30 days.\n"
-    "- If topics are many, group related topics together.\n\n"
-    "EXAMPLE INPUT:\n"
-    "['variables', 'loops', 'functions', 'OOP', 'recursion']\n\n"
-    "EXAMPLE OUTPUT:\n"
-    "{\n"
-    '  "day_1": ["variables"],\n'
-    '  "day_2": ["loops"],\n'
-    '  "day_3": ["functions"],\n'
-    '  "day_4": ["OOP"],\n'
-    '  "day_5": ["recursion"],\n'
-    '  "day_6": [],\n'
-    "  ...\n"
-    '  "day_30": []\n'
-    "}\n\n"
-    "Now generate the 30-day plan from the provided roadmap."""
+languages = {"1": "Python", "2": "JavaScript", "3": "Java"}
 
 
 def generate_answer(prompt, promptStructure):
@@ -94,23 +33,115 @@ def roadmapExtract(language):
     return steps
 
 
-def createPlan(roadmap):
-    roadmap_text = "\n".join(roadmap)
+def createPlan(roadmap, USE_BREAKS):
+    roadmap_text = json.dumps(roadmap)
+
+    PLAN = f"""
+    You are an expert programming curriculum designer.
+
+    Your task is to convert a list of learning roadmap steps into a structured 30-day learning plan.
+
+    INPUT:
+    You will receive an array of learning topics (roadmap steps).
+
+    GLOBAL FLAG:
+    USE_BREAKS = {USE_BREAKS}
+
+    CRITICAL PACING RULE (MOST IMPORTANT):
+    You MUST NOT speedrun the curriculum.
+    You MUST spread learning evenly across all 30 days.
+    Each concept should be learned slowly with proper spacing and reinforcement.
+
+    STRICT LEARNING SPEED RULES:
+    - Maximum 1 core concept per day (very important)
+    - If a topic is large (e.g., OOP, Web Dev), split it across multiple days
+    - NEVER combine more than 1 major concept in a single day
+    - You MUST revisit earlier concepts implicitly through progression (do not skip ahead)
+
+    LEARNING FLOW RULE:
+    - One concept must be fully introduced before moving to the next
+    - No jumping from basics directly to frameworks
+    - No clustering multiple advanced topics early
+
+    LEARNING ORDER PRIORITY:
+    1. Syntax, variables, data types
+    2. Control flow (if/else, loops)
+    3. Functions
+    4. Data structures (lists, dicts, sets, tuples)
+    5. OOP (must be spread across multiple days)
+    6. File handling & error handling
+    7. Libraries (requests, numpy, pandas) (must be separated across days)
+    8. Web frameworks (Flask/Django) (must take multiple days)
+    9. Projects & practice days
+
+    BREAK RULE (VERY IMPORTANT):
+    - If USE_BREAKS is true:
+        - Include exactly 1 rest day every 5–7 learning days
+        - Rest days MUST be spread out across the plan
+        - NEVER place all rest days at the end
+        - Rest days must be between learning days (natural spacing)
+        - Rest day format: ["rest"]
+
+    - If USE_BREAKS is false:
+        - No rest days allowed
+
+    ANTI-SPEEDRUN RULE:
+    - Do NOT compress multiple topics just to finish early
+    - Do NOT complete the roadmap before day 30
+    - You MUST stretch learning across the full 30 days evenly
+
+    TASK:
+    1. Break topics into small teachable steps
+    2. Spread them evenly across 30 days
+    3. Ensure proper prerequisite order
+    4. Ensure no day is overloaded
+    5. Ensure slow progressive learning
+
+    OUTPUT FORMAT (STRICT JSON ONLY):
+    {{
+    "day_1": ["topic"],
+    "day_2": ["topic"],
+    ...
+    "day_30": ["topic"]
+    }}
+
+    RULES:
+    - Do NOT include explanations
+    - Do NOT include markdown
+    - Do NOT add extra text
+    - Always return exactly 30 days
+    - Keep learning slow, spaced, and realistic for beginners
+
+    Now generate the 30-day plan.
+    """
 
     answer = generate_answer(roadmap_text, PLAN)
     print(f"Your 30-days Plan is following:\n{answer}")
 
 
-while answerDone == False:
-    user_input = input("What do you want to learn and plan today? ")
+def userChoice():
+    choice = ""
 
-    answer = generate_answer(user_input, STARTING_PROMPT)
+    while choice not in ["1", "2", "3"]:
+        print("Please select the programming language you want to learn:")
+        print("1. Python")
+        print("2. JavaScript")
+        print("3. Java")
 
-    language = answer.strip()
+        choice = input("Enter your choice (1, 2, or 3): ")
 
-    if len(answer) > 10:
-        print(answer)
-    else:
-        roadmap = roadmapExtract(language.lower())
-        createPlan(roadmap)
-        answerDone = True
+    # Ask about breaks
+    breaks = ""
+    while breaks not in ["y", "n"]:
+        breaks = input("Do you want rest days in your 30-day plan? (y/n): ").lower()
+
+    return choice, breaks
+
+
+choice, breaks = userChoice()
+
+USE_BREAKS = breaks == "y"
+
+roadmap = roadmapExtract(languages[choice].lower())
+
+createPlan(roadmap, USE_BREAKS)
