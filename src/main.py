@@ -69,7 +69,7 @@ Now generate coding practice questions for the provided plan.
 """
 
 
-PLAN = f"""
+PLAN = """
 You are an expert programming curriculum designer.
 THIS IS A HARD CONSTRAINT SYSTEM. YOU MUST FOLLOW ALL RULES EXACTLY. NO EXCEPTIONS.
 
@@ -296,7 +296,9 @@ st.write("Generate a personalized 30-day programming roadmap.")
 with st.sidebar:
     st.header("Settings")
 
-    language = st.selectbox("Programming Language", ["Python", "JavaScript", "Java"])
+    language = st.selectbox(
+        "Programming Language", ["Python", "JavaScript", "Java", "C++", "Go"]
+    )
 
     generate = st.button("Generate Plan", use_container_width=True)
 
@@ -497,7 +499,7 @@ if PracticeQuestions:
                     theme="monokai",
                     height=250,
                     key=f"ace_{key}",
-                    auto_update=True
+                    auto_update=True,
                 )
 
                 col1, col2 = st.columns(2)
