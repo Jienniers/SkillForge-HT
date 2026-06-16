@@ -3,7 +3,7 @@ import json
 import streamlit as st
 import re
 
-jsonRoadmapFile = "./roadmap.json"
+jsonRoadmapFile = "./data/roadmap.json"
 
 USE_BREAKS = "False"
 
@@ -115,31 +115,94 @@ def createPlan(roadmap, USE_BREAKS):
 
     PLAN = f"""
     You are an expert programming curriculum designer.
-    THIS IS A HARD CONSTRAINT SYSTEM. YOU MUST FOLLOW ALL BOOLEAN FLAGS EXACTLY. NO EXCEPTIONS.
+    THIS IS A HARD CONSTRAINT SYSTEM. YOU MUST FOLLOW ALL RULES EXACTLY. NO EXCEPTIONS.
 
-    Your task is to convert a list of learning roadmap steps into a structured 30-day learning plan.
+    You will be given a list of learning roadmap topics.
+
+    Your task is to convert them into a structured 30-day learning plan.
 
     INPUT:
-    You will receive an array of learning topics (roadmap steps).
+    - Array of learning topics (roadmap steps)
 
     GLOBAL FLAG:
-    USE_BREAKS = {USE_BREAKS}
+    USE_BREAKS = {USE_BREAKS}  (BOOLEAN: True or False)
+
+    ---
+
+    CRITICAL PARSING RULE (VERY IMPORTANT):
+    - Treat USE_BREAKS as a REAL BOOLEAN
+    - If USE_BREAKS is True → rest days are allowed
+    - If USE_BREAKS is False → rest days are STRICTLY FORBIDDEN
+
+    Do NOT interpret this loosely.
+
+    ---
 
     CRITICAL PACING RULE (MOST IMPORTANT):
-    You MUST NOT speedrun the curriculum.
-    You MUST spread learning evenly across all 30 days.
-    Each concept should be learned slowly with proper spacing and reinforcement.
+    - Spread learning evenly across exactly 30 days
+    - Do NOT speedrun
+    - Do NOT compress learning into fewer days
 
-    STRICT LEARNING SPEED RULES:
-    - Maximum 1 core concept per day (very important)
-    - If a topic is large (e.g., OOP, Web Dev), split it across multiple days
-    - NEVER combine more than 1 major concept in a single day
-    - You MUST revisit earlier concepts implicitly through progression (do not skip ahead)
+    ---
+
+    STRICT LEARNING RULES:
+    - Maximum 1 core concept per day
+    - Large topics MUST be split into multiple sub-skills across multiple days
+    - Never combine multiple unrelated concepts in one day
+    - Learning must follow prerequisite order strictly
+
+    ---
+
+    TOPIC EXPANSION RULE (CRITICAL FIX FOR REPETITION):
+
+    If total topics are fewer than 30 days:
+
+    You MUST NOT repeat identical topics.
+
+    Instead:
+
+    1. Break each topic into sub-skills:
+    - fundamentals
+    - implementation
+    - variations
+    - edge cases
+    - real-world usage
+
+    2. Convert into progression levels:
+    - beginner → intermediate → advanced → applied
+
+    3. Create applied days:
+    - mini projects
+    - debugging exercises
+    - real-world coding tasks
+    - refactoring tasks
+
+    ONLY if absolutely necessary:
+    You may revisit a topic, BUT it MUST be transformed
+    (e.g., "Functions - advanced usage", NOT "Functions" again)
+
+    ---
+
+    REST DAY RULE (BOOLEAN CONTROLLED):
+
+    IF USE_BREAKS = True:
+    - You MAY include rest days
+    - Maximum 3 rest days total
+    - Must be evenly spaced
+
+    IF USE_BREAKS = False:
+    - YOU MUST NOT include ANY rest days
+    - Not even one
+    - No placeholders or “rest” labels allowed
+
+    ---
 
     LEARNING FLOW RULE:
-    - One concept must be fully introduced before moving to the next
-    - No jumping from basics directly to frameworks
-    - No clustering multiple advanced topics early
+    - One concept must be fully understood before moving forward
+    - No jumping from basics to frameworks
+    - No clustering advanced topics early
+
+    ---
 
     LEARNING ORDER PRIORITY:
     1. Syntax, variables, data types
@@ -148,36 +211,32 @@ def createPlan(roadmap, USE_BREAKS):
     4. Data structures (lists, dicts, sets, tuples)
     5. OOP (must be spread across multiple days)
     6. File handling & error handling
-    7. Libraries (requests, numpy, pandas) (must be separated across days)
-    8. Web frameworks (Flask/Django) (must take multiple days)
-    9. Projects & practice days
+    7. Libraries (requests, numpy, pandas)
+    8. Web frameworks (Flask/Django)
+    9. Projects and applied practice
 
-    BREAK RULE (ABSOLUTE PRIORITY):
-
-    - If USE_BREAKS is false:
-        - YOU ARE STRICTLY FORBIDDEN from adding ANY rest day.
-        - EVEN IF spacing feels uneven.
-        - EVEN IF roadmap feels dense.
-        - Rest days do NOT exist in this mode under any circumstance.
-
-    - If USE_BREAKS is true:
-        - You MAY include rest days
-        - Maximum: 3 rest days total
-        - Must be evenly distributed
+    ---
 
     ANTI-SPEEDRUN RULE:
-    - Do NOT compress multiple topics just to finish early
-    - Do NOT complete the roadmap before day 30
-    - You MUST stretch learning across the full 30 days evenly
+    - Do NOT finish early
+    - You MUST use all 30 days meaningfully
+    - No filler repetition allowed
+    - Every day must be unique in learning purpose
+
+    ---
 
     TASK:
-    1. Break topics into small teachable steps
-    2. Spread them evenly across 30 days
-    3. Ensure proper prerequisite order
-    4. Ensure no day is overloaded
-    5. Ensure slow progressive learning
+    1. Expand roadmap into sub-skills
+    2. Map them into 30 days
+    3. Ensure correct order
+    4. Ensure balanced difficulty progression
+    5. Ensure no repetition unless transformed
+    6. Respect USE_BREAKS exactly
+
+    ---
 
     OUTPUT FORMAT (STRICT JSON ONLY):
+
     {{
     "day_1": ["topic"],
     "day_2": ["topic"],
@@ -186,15 +245,14 @@ def createPlan(roadmap, USE_BREAKS):
     }}
 
     RULES:
-    - Do NOT include explanations
-    - Do NOT include markdown
-    - Do NOT add extra text
+    - Output ONLY valid JSON
+    - No markdown
+    - No explanations
+    - No extra text
     - Always return exactly 30 days
-    - Keep learning slow, spaced, and realistic for beginners
 
     Now generate the 30-day plan.
     """
-
     raw = generate_answer(roadmap_text, PLAN)
 
     cleaned = clean_json(raw)
