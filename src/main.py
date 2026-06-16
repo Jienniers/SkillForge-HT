@@ -2,6 +2,7 @@ from openai import OpenAI
 import json
 import streamlit as st
 import re
+from streamlit_ace import st_ace
 
 jsonRoadmapFile = "./data/roadmap.json"
 
@@ -68,6 +69,131 @@ Now generate coding practice questions for the provided plan.
 """
 
 
+PLAN = f"""
+You are an expert programming curriculum designer.
+THIS IS A HARD CONSTRAINT SYSTEM. YOU MUST FOLLOW ALL RULES EXACTLY. NO EXCEPTIONS.
+
+You will be given a list of learning roadmap topics.
+
+Your task is to convert them into a structured 30-day learning plan.
+
+INPUT:
+- Array of learning topics (roadmap steps)
+
+---
+
+CRITICAL PARSING RULE (VERY IMPORTANT):
+- Treat USE_BREAKS as a REAL BOOLEAN
+- If USE_BREAKS is True → rest days are allowed
+- If USE_BREAKS is False → rest days are STRICTLY FORBIDDEN
+
+Do NOT interpret this loosely.
+
+---
+
+CRITICAL PACING RULE (MOST IMPORTANT):
+- Spread learning evenly across exactly 30 days
+- Do NOT speedrun
+- Do NOT compress learning into fewer days
+
+---
+
+STRICT LEARNING RULES:
+- Maximum 1 core concept per day
+- Large topics MUST be split into multiple sub-skills across multiple days
+- Never combine multiple unrelated concepts in one day
+- Learning must follow prerequisite order strictly
+
+---
+
+TOPIC EXPANSION RULE (CRITICAL FIX FOR REPETITION):
+
+If total topics are fewer than 30 days:
+
+You MUST NOT repeat identical topics.
+
+Instead:
+
+1. Break each topic into sub-skills:
+- fundamentals
+- implementation
+- variations
+- edge cases
+- real-world usage
+
+2. Convert into progression levels:
+- beginner → intermediate → advanced → applied
+
+3. Create applied days:
+- mini projects
+- debugging exercises
+- real-world coding tasks
+- refactoring tasks
+
+ONLY if absolutely necessary:
+You may revisit a topic, BUT it MUST be transformed
+(e.g., "Functions - advanced usage", NOT "Functions" again)
+
+---
+
+LEARNING FLOW RULE:
+- One concept must be fully understood before moving forward
+- No jumping from basics to frameworks
+- No clustering advanced topics early
+
+---
+
+LEARNING ORDER PRIORITY:
+1. Syntax, variables, data types
+2. Control flow (if/else, loops)
+3. Functions
+4. Data structures (lists, dicts, sets, tuples)
+5. OOP (must be spread across multiple days)
+6. File handling & error handling
+7. Libraries (requests, numpy, pandas)
+8. Web frameworks (Flask/Django)
+9. Projects and applied practice
+
+---
+
+ANTI-SPEEDRUN RULE:
+- Do NOT finish early
+- You MUST use all 30 days meaningfully
+- No filler repetition allowed
+- Every day must be unique in learning purpose
+
+---
+
+TASK:
+1. Expand roadmap into sub-skills
+2. Map them into 30 days
+3. Ensure correct order
+4. Ensure balanced difficulty progression
+5. Ensure no repetition unless transformed
+6. Respect USE_BREAKS exactly
+
+---
+
+OUTPUT FORMAT (STRICT JSON ONLY):
+
+{{
+"day_1": ["topic"],
+"day_2": ["topic"],
+...
+"day_30": ["topic"]
+}}
+
+RULES:
+- Output ONLY valid JSON
+- No markdown
+- No explanations
+- No extra text
+- Always return exactly 30 days
+
+Now generate the 30-day plan.
+"""
+
+
 def generate_answer(prompt, promptStructure):
     client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
@@ -110,149 +236,9 @@ def clean_json(text: str):
     return text[start : end + 1]
 
 
-def createPlan(roadmap, USE_BREAKS):
+def createPlan(roadmap):
     roadmap_text = json.dumps(roadmap)
 
-    PLAN = f"""
-    You are an expert programming curriculum designer.
-    THIS IS A HARD CONSTRAINT SYSTEM. YOU MUST FOLLOW ALL RULES EXACTLY. NO EXCEPTIONS.
-
-    You will be given a list of learning roadmap topics.
-
-    Your task is to convert them into a structured 30-day learning plan.
-
-    INPUT:
-    - Array of learning topics (roadmap steps)
-
-    GLOBAL FLAG:
-    USE_BREAKS = {USE_BREAKS}  (BOOLEAN: True or False)
-
-    ---
-
-    CRITICAL PARSING RULE (VERY IMPORTANT):
-    - Treat USE_BREAKS as a REAL BOOLEAN
-    - If USE_BREAKS is True → rest days are allowed
-    - If USE_BREAKS is False → rest days are STRICTLY FORBIDDEN
-
-    Do NOT interpret this loosely.
-
-    ---
-
-    CRITICAL PACING RULE (MOST IMPORTANT):
-    - Spread learning evenly across exactly 30 days
-    - Do NOT speedrun
-    - Do NOT compress learning into fewer days
-
-    ---
-
-    STRICT LEARNING RULES:
-    - Maximum 1 core concept per day
-    - Large topics MUST be split into multiple sub-skills across multiple days
-    - Never combine multiple unrelated concepts in one day
-    - Learning must follow prerequisite order strictly
-
-    ---
-
-    TOPIC EXPANSION RULE (CRITICAL FIX FOR REPETITION):
-
-    If total topics are fewer than 30 days:
-
-    You MUST NOT repeat identical topics.
-
-    Instead:
-
-    1. Break each topic into sub-skills:
-    - fundamentals
-    - implementation
-    - variations
-    - edge cases
-    - real-world usage
-
-    2. Convert into progression levels:
-    - beginner → intermediate → advanced → applied
-
-    3. Create applied days:
-    - mini projects
-    - debugging exercises
-    - real-world coding tasks
-    - refactoring tasks
-
-    ONLY if absolutely necessary:
-    You may revisit a topic, BUT it MUST be transformed
-    (e.g., "Functions - advanced usage", NOT "Functions" again)
-
-    ---
-
-    REST DAY RULE (BOOLEAN CONTROLLED):
-
-    IF USE_BREAKS = True:
-    - You MAY include rest days
-    - Maximum 3 rest days total
-    - Must be evenly spaced
-
-    IF USE_BREAKS = False:
-    - YOU MUST NOT include ANY rest days
-    - Not even one
-    - No placeholders or “rest” labels allowed
-
-    ---
-
-    LEARNING FLOW RULE:
-    - One concept must be fully understood before moving forward
-    - No jumping from basics to frameworks
-    - No clustering advanced topics early
-
-    ---
-
-    LEARNING ORDER PRIORITY:
-    1. Syntax, variables, data types
-    2. Control flow (if/else, loops)
-    3. Functions
-    4. Data structures (lists, dicts, sets, tuples)
-    5. OOP (must be spread across multiple days)
-    6. File handling & error handling
-    7. Libraries (requests, numpy, pandas)
-    8. Web frameworks (Flask/Django)
-    9. Projects and applied practice
-
-    ---
-
-    ANTI-SPEEDRUN RULE:
-    - Do NOT finish early
-    - You MUST use all 30 days meaningfully
-    - No filler repetition allowed
-    - Every day must be unique in learning purpose
-
-    ---
-
-    TASK:
-    1. Expand roadmap into sub-skills
-    2. Map them into 30 days
-    3. Ensure correct order
-    4. Ensure balanced difficulty progression
-    5. Ensure no repetition unless transformed
-    6. Respect USE_BREAKS exactly
-
-    ---
-
-    OUTPUT FORMAT (STRICT JSON ONLY):
-
-    {{
-    "day_1": ["topic"],
-    "day_2": ["topic"],
-    ...
-    "day_30": ["topic"]
-    }}
-
-    RULES:
-    - Output ONLY valid JSON
-    - No markdown
-    - No explanations
-    - No extra text
-    - Always return exactly 30 days
-
-    Now generate the 30-day plan.
-    """
     raw = generate_answer(roadmap_text, PLAN)
 
     cleaned = clean_json(raw)
@@ -312,17 +298,16 @@ with st.sidebar:
 
     language = st.selectbox("Programming Language", ["Python", "JavaScript", "Java"])
 
-    breaks = st.checkbox("Include Rest Days")
-
     generate = st.button("Generate Plan", use_container_width=True)
+
+currentlyChosenLanguage = ""
 
 # Generate plan when button is clicked
 if generate:
-    USE_BREAKS = breaks
+    currentlyChosenLanguage = language.lower()
+    roadmap = roadmapExtract(currentlyChosenLanguage)
 
-    roadmap = roadmapExtract(language.lower())
-
-    wholePlan = createPlan(roadmap, USE_BREAKS)
+    wholePlan = createPlan(roadmap)
 
     # Convert to dict if AI returned JSON string
     if isinstance(wholePlan, str):
@@ -441,7 +426,6 @@ if PracticeQuestions:
     st.divider()
     st.header("🧠 Practice Zone (Python / JS / Java)")
 
-
     # ----------------------------
     # FORMAT DAY NAME
     # ----------------------------
@@ -452,7 +436,6 @@ if PracticeQuestions:
             return f"{base} (✅ Passed)"
 
         return base
-
 
     # ----------------------------
     # DAY SELECTOR
@@ -466,7 +449,6 @@ if PracticeQuestions:
     day_data = PracticeQuestions[selected_day]
 
     st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
-
 
     # ----------------------------
     # TRACK DAY PROGRESS
@@ -489,7 +471,6 @@ if PracticeQuestions:
 
         return correct, total
 
-
     # ----------------------------
     # QUESTIONS UI
     # ----------------------------
@@ -508,7 +489,16 @@ if PracticeQuestions:
                 # ------------------------
                 # ANSWER INPUT
                 # ------------------------
-                answer = st.text_area("✍️ Your Code", key=key, height=120)
+                # answer = st.text_area("✍️ Your Code", key=key, height=120)
+
+                answer = st_ace(
+                    value=st.session_state.get(key, ""),
+                    language=currentlyChosenLanguage,
+                    theme="monokai",
+                    height=250,
+                    key=f"ace_{key}",
+                    auto_update=True
+                )
 
                 col1, col2 = st.columns(2)
 
@@ -529,7 +519,6 @@ if PracticeQuestions:
                             st.rerun()
 
                         show_result(result)
-
 
     # ----------------------------
     # MARK DAY COMPLETE
