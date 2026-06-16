@@ -1,12 +1,11 @@
 from openai import OpenAI
 import json
+import streamlit as st
+import re
 
 jsonRoadmapFile = "./roadmap.json"
 
-USE_BREAKS = True
-
-languages = {"1": "Python", "2": "JavaScript", "3": "Java"}
-
+USE_BREAKS = "False"
 
 PRACTICE_SYSTEM_PROMPT = """
 You are an expert Python programming tutor and coding assessment generator.
@@ -94,6 +93,23 @@ def roadmapExtract(language):
     return steps
 
 
+def clean_json(text: str):
+    # remove ```json or ``` wrappers
+    text = re.sub(r"```json", "", text)
+    text = re.sub(r"```", "", text)
+
+    text = text.strip()
+
+    # extract first {...last...}
+    start = text.find("{")
+    end = text.rfind("}")
+
+    if start == -1 or end == -1:
+        raise ValueError("No JSON object found")
+
+    return text[start : end + 1]
+
+
 def createPlan(roadmap, USE_BREAKS):
     roadmap_text = json.dumps(roadmap)
 
@@ -179,57 +195,220 @@ def createPlan(roadmap, USE_BREAKS):
     Now generate the 30-day plan.
     """
 
-    answer = generate_answer(roadmap_text, PLAN)
-    print(f"Your 30-days Plan is following:\n{answer}")
+    raw = generate_answer(roadmap_text, PLAN)
 
-    return answer
+    cleaned = clean_json(raw)
 
-
-def userChoice():
-    choice = ""
-
-    while choice not in ["1", "2", "3"]:
-        print("Please select the programming language you want to learn:")
-        print("1. Python")
-        print("2. JavaScript")
-        print("3. Java")
-
-        choice = input("Enter your choice (1, 2, or 3): ")
-
-    # Ask about breaks
-    breaks = ""
-    while breaks not in ["y", "n"]:
-        breaks = input("Do you want rest days in your 30-day plan? (y/n): ").lower()
-
-    return choice, breaks
+    try:
+        return json.loads(cleaned)
+    except Exception as e:
+        print("RAW OUTPUT:\n", raw)
+        raise ValueError("Model returned invalid JSON")
 
 
-choice, breaks = userChoice()
+def check_answer(question, user_code):
+    prompt = f"""
+You are a strict but helpful coding evaluator.
 
-USE_BREAKS = breaks == "y"
+TASK:
+You are given a coding question and a user's answer.
 
-roadmap = roadmapExtract(languages[choice].lower())
+Decide if the answer is correct.
 
-wholePlan = createPlan(roadmap, USE_BREAKS)
+RULES:
+- If logic is correct or partially correct → mark as CORRECT
+- If wrong → explain clearly what is wrong and how to fix it
+- Be concise
+- Focus on correctness, not style
 
-print(
-    f"Your 30-day plan for learning {languages[choice]} is ready. Check it out above."
+OUTPUT FORMAT (STRICT):
+If correct:
+✅ Correct
+
+If incorrect:
+❌ Incorrect
+Explanation: <what is wrong>
+Fix: <how to fix it>
+
+QUESTION:
+{question}
+
+USER CODE:
+{user_code}
+"""
+
+    return generate_answer(prompt, "")
+
+
+wholePlan = ""
+
+
+st.set_page_config(page_title="SkillForge", page_icon="🚀", layout="wide")
+
+st.title("🚀 SkillForge")
+st.write("Generate a personalized 30-day programming roadmap.")
+
+# Sidebar
+with st.sidebar:
+    st.header("Settings")
+
+    language = st.selectbox("Programming Language", ["Python", "JavaScript", "Java"])
+
+    breaks = st.checkbox("Include Rest Days")
+
+    generate = st.button("Generate Plan", use_container_width=True)
+
+# Generate plan when button is clicked
+if generate:
+    USE_BREAKS = breaks
+
+    roadmap = roadmapExtract(language.lower())
+
+    wholePlan = createPlan(roadmap, USE_BREAKS)
+
+    # Convert to dict if AI returned JSON string
+    if isinstance(wholePlan, str):
+        try:
+            wholePlan = json.loads(wholePlan)
+        except json.JSONDecodeError:
+            st.error("The AI did not return valid JSON.")
+            st.code(wholePlan)
+            st.stop()
+
+    # Save plan so it survives reruns
+    st.session_state["plan"] = wholePlan
+    st.session_state["language"] = language
+
+
+# Display plan
+if "plan" in st.session_state:
+
+    st.header(f"📚 {st.session_state['language']} - 30 Day Learning Plan")
+
+    plan = st.session_state["plan"]
+
+    cols = st.columns(3)
+
+    for index, (day, topics) in enumerate(plan.items()):
+
+        with cols[index % 3]:
+
+            day_number = day.replace("_", " ").title()
+
+            with st.expander(day_number, expanded=False):
+
+                for topic in topics:
+
+                    if topic.lower() == "rest day":
+                        st.success("😴 Rest Day")
+                    else:
+                        st.write(f"✅ {topic}")
+
+
+# ----------------------------
+# JSON CLEANER
+# ----------------------------
+def clean_prac_json(raw: str):
+    if not raw:
+        return "{}"
+
+    raw = raw.strip()
+    raw = re.sub(r"```json", "", raw)
+    raw = re.sub(r"```", "", raw)
+
+    return raw.strip()
+
+
+# ----------------------------
+# GENERATE ONCE (CACHE)
+# ----------------------------
+if "practice_questions" not in st.session_state:
+
+    raw = generate_answer(json.dumps(wholePlan), PRACTICE_SYSTEM_PROMPT)
+
+    cleaned = clean_prac_json(raw)
+
+    try:
+        st.session_state["practice_questions"] = json.loads(cleaned)
+
+    except Exception:
+        st.error("LLM returned invalid JSON ❌")
+        st.code(raw)
+        st.stop()
+
+
+PracticeQuestions = st.session_state["practice_questions"]
+
+
+# ----------------------------
+# UI HEADER
+# ----------------------------
+st.divider()
+st.header("🧠 Practice Zone (Python / JS / Java)")
+
+
+# ----------------------------
+# FORMAT DAYS (Day 1, Day 2...)
+# ----------------------------
+def format_day(day_key: str):
+    return day_key.replace("_", " ").title()
+
+
+# ----------------------------
+# DAY SELECTOR
+# ----------------------------
+days = list(PracticeQuestions.keys())
+
+selected_day = st.selectbox(
+    "📅 Select a Day",
+    days,
+    format_func=format_day,  # 👈 shows "Day 1" instead of "day_1"
 )
 
-print("Your practice questions are also ready. Check them out below.")
+day_data = PracticeQuestions[selected_day]
 
-PracticeQuestions = generate_answer(json.dumps(wholePlan), PRACTICE_SYSTEM_PROMPT)
+st.subheader(f"📘 {format_day(selected_day)}")
 
-PracticeQuestions = json.loads(PracticeQuestions)
 
-print(json.dumps(PracticeQuestions, indent=4))
+# ----------------------------
+# QUESTIONS RENDERER
+# ----------------------------
+for topic, questions in day_data.items():
 
-while True:
-    print("Do you want to extract any day question?")
-    day = input("Enter the day number (1-30): ")
+    with st.expander(f"📌 {topic}"):
 
-    if day.isdigit():
-        day = int(day)
+        for i, question in enumerate(questions):
 
-        if 1 <= day <= 30:
-            print(PracticeQuestions[f"day_{day}"])
+            st.markdown(f"### ❓ Question {i + 1}")
+            st.write(question)
+
+            key = f"{selected_day}_{topic}_{i}"
+
+            # ------------------------
+            # ANSWER BOX
+            # ------------------------
+            answer = st.text_area(
+                "✍️ Your Answer",
+                key=key,
+                height=120,
+                placeholder="Write your code here...",
+            )
+
+            col1, col2 = st.columns(2)
+
+            # ------------------------
+            # SAVE BUTTON
+            # ------------------------
+            with col1:
+                if st.button("💾 Save", key=f"save_{key}"):
+                    st.session_state[key] = answer
+                    st.success("Saved!")
+
+            # ------------------------
+            # CLEAR BUTTON
+            # ------------------------
+            with col2:
+                if st.button("🧹 Clear", key=f"clear_{key}"):
+
+                    st.session_state[key] = ""
+                    st.rerun()
