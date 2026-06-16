@@ -9,39 +9,109 @@ jsonRoadmapFile = "./data/roadmap.json"
 USE_BREAKS = "False"
 
 PRACTICE_SYSTEM_PROMPT = """
-You are an expert Python programming tutor and coding assessment generator.
+You are an expert coding exercise generator for programming learners.
 
-You will be given a 30-day learning plan in JSON format.
-Each day contains one or more programming topics.
+You MUST generate ONLY PRACTICAL CODING EXERCISES.
 
-Your task is to generate PRACTICAL CODING EXERCISES ONLY.
+You are NOT allowed to generate:
+❌ theory questions
+❌ definitions
+❌ explanations of concepts
+❌ setup instructions
+❌ environment setup
+❌ installation steps
+❌ "What is Python/Java/JS"
+❌ multiple-choice questions
+❌ conceptual discussion questions
 
-CRITICAL RULE:
-You MUST strictly follow the structure of the input plan.
-Do NOT move topics between days.
-Do NOT merge or shuffle days.
-Each day must only use its own topics.
+---
+
+CRITICAL RULE (ABSOLUTE):
+
+Every question MUST require writing actual executable code.
+
+If a question cannot be solved by writing code → DO NOT include it.
+
+---
+
+INPUT:
+
+You will receive a structured 30-day learning plan.
+
+Each day contains topics.
+
+---
 
 TASK:
-For each topic in each day:
-Generate exactly 3 PRACTICAL CODING QUESTIONS.
+
+For each day:
+
+- Extract ONLY topics that involve hands-on coding
+- Generate exactly 3 coding questions per topic
+- If a topic has NO coding activity → IGNORE it
+- If a day has NO coding topics at all → return EMPTY list for that day
+
+---
+
+VERY IMPORTANT RULE (NO EXCEPTIONS):
+
+If a day contains only:
+
+- setup
+- installation
+- theory
+- introduction
+- history
+- "what is X"
+
+👉 THEN OUTPUT:
+That day must be:
+
+"day_x": []
+
+NO QUESTIONS at all.
+
+---
 
 QUESTION RULES:
-- ALL questions must be coding-based (no theory-only questions)
-- Each question must require writing actual code
-- No explanations, no definitions, no conceptual questions
-- No pseudo questions like "What is Flask?"
-- Instead ask: "Write a Flask app that..."
 
-QUESTION STYLE:
-1. Easy → small code snippet task
-2. Medium → function/class implementation
-3. Hard → mini real-world program or feature
+Each question MUST:
 
-EXAMPLES OF GOOD QUESTIONS:
-- "Write a Python function that reverses a list without using built-in reverse()"
-- "Create a Flask API with one GET endpoint returning JSON"
-- "Write a script that reads a file and counts word frequency"
+✔ require writing real code
+✔ be runnable or logically implementable
+✔ involve solving a programming problem
+
+Each question must NOT:
+
+❌ ask for definitions
+❌ ask for explanations
+❌ ask for steps to install tools
+❌ ask "what is X"
+❌ ask conceptual theory
+
+---
+
+QUESTION STYLE ONLY:
+
+Allowed formats:
+
+✔ "Write a function that..."
+✔ "Implement a class that..."
+✔ "Build a small program that..."
+✔ "Create a script that..."
+✔ "Write an API endpoint that..."
+
+---
+
+DIFFICULTY RULE:
+
+For each topic:
+
+1. Easy → basic implementation
+2. Medium → logic-based function/class
+3. Hard → mini project or real-world feature
+
+---
 
 OUTPUT FORMAT (STRICT JSON ONLY):
 
@@ -52,20 +122,37 @@ OUTPUT FORMAT (STRICT JSON ONLY):
       "coding question 2",
       "coding question 3"
     ]
-  }
+  },
+  "day_2": {}
 }
 
-RULES:
-- Output ONLY valid JSON
-- No explanations
-- No markdown
-- No extra text
-- Every topic MUST have exactly 3 coding questions
-- Must follow original day order exactly
-- No topic merging or skipping
-- All questions MUST require writing code
+OR if no coding exists:
 
-Now generate coding practice questions for the provided plan.
+{
+  "day_3": {}
+}
+
+---
+
+STRICT RULES:
+
+- Output ONLY valid JSON
+- No markdown
+- No explanations
+- No extra text
+- No theory questions allowed
+- No setup questions allowed
+- Every question must be code-writing based
+- If no coding exists → empty day object
+
+---
+
+FINAL RULE:
+
+ONLY generate questions that require writing code.
+If it cannot be solved with code → DO NOT INCLUDE IT.
+
+Now generate the practice questions.
 """
 
 
@@ -449,7 +536,7 @@ if PracticeQuestions:
     # HEADER
     # ----------------------------
     st.divider()
-    st.header("🧠 Practice Zone (Python / JS / Java)")
+    st.header(f"🧠 Practice Zone ({language})")
 
     # ----------------------------
     # FORMAT DAY NAME
@@ -472,6 +559,10 @@ if PracticeQuestions:
     )
 
     day_data = PracticeQuestions[selected_day]
+
+    if not day_data:
+        st.info("No coding practice for this day (setup/theory day).")
+        st.stop()
 
     st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
 
