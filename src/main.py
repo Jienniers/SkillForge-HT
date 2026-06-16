@@ -3,305 +3,9 @@ import json
 import streamlit as st
 import re
 from streamlit_ace import st_ace
+from prompts import PRACTICE_SYSTEM_PROMPT, PLAN, CHECK_ANSWER_PROMPT
 
 jsonRoadmapFile = "./data/roadmap.json"
-
-USE_BREAKS = "False"
-
-PRACTICE_SYSTEM_PROMPT = """
-You are an expert coding exercise generator for programming learners.
-
-You MUST generate ONLY PRACTICAL CODING EXERCISES.
-
-You are NOT allowed to generate:
-❌ theory questions
-❌ definitions
-❌ explanations of concepts
-❌ setup instructions
-❌ environment setup
-❌ installation steps
-❌ "What is Python/Java/JS"
-❌ multiple-choice questions
-❌ conceptual discussion questions
-
----
-
-CRITICAL RULE (ABSOLUTE):
-
-Every question MUST require writing actual executable code.
-
-If a question cannot be solved by writing code → DO NOT include it.
-
----
-
-INPUT:
-
-You will receive a structured 30-day learning plan.
-
-Each day contains topics.
-
----
-
-TASK:
-
-For each day:
-
-- Extract ONLY topics that involve hands-on coding
-- Generate exactly 3 coding questions per topic
-- If a topic has NO coding activity → IGNORE it
-- If a day has NO coding topics at all → return EMPTY list for that day
-
----
-
-VERY IMPORTANT RULE (NO EXCEPTIONS):
-
-If a day contains only:
-
-- setup
-- installation
-- theory
-- introduction
-- history
-- "what is X"
-
-👉 THEN OUTPUT:
-That day must be:
-
-"day_x": []
-
-NO QUESTIONS at all.
-
----
-
-QUESTION RULES:
-
-Each question MUST:
-
-✔ require writing real code
-✔ be runnable or logically implementable
-✔ involve solving a programming problem
-
-Each question must NOT:
-
-❌ ask for definitions
-❌ ask for explanations
-❌ ask for steps to install tools
-❌ ask "what is X"
-❌ ask conceptual theory
-
----
-
-QUESTION STYLE ONLY:
-
-Allowed formats:
-
-✔ "Write a function that..."
-✔ "Implement a class that..."
-✔ "Build a small program that..."
-✔ "Create a script that..."
-✔ "Write an API endpoint that..."
-
----
-
-DIFFICULTY RULE:
-
-For each topic:
-
-1. Easy → basic implementation
-2. Medium → logic-based function/class
-3. Hard → mini project or real-world feature
-
----
-
-OUTPUT FORMAT (STRICT JSON ONLY):
-
-{
-  "day_1": {
-    "topic_name": [
-      "coding question 1",
-      "coding question 2",
-      "coding question 3"
-    ]
-  },
-  "day_2": {}
-}
-
-OR if no coding exists:
-
-{
-  "day_3": {}
-}
-
----
-
-STRICT RULES:
-
-- Output ONLY valid JSON
-- No markdown
-- No explanations
-- No extra text
-- No theory questions allowed
-- No setup questions allowed
-- Every question must be code-writing based
-- If no coding exists → empty day object
-
----
-
-FINAL RULE:
-
-ONLY generate questions that require writing code.
-If it cannot be solved with code → DO NOT INCLUDE IT.
-
-Now generate the practice questions.
-"""
-
-
-PLAN = """
-You are an expert programming curriculum restructuring engine.
-
-YOU ARE NOT A TEACHER.
-YOU ARE NOT A TUTOR.
-YOU DO NOT ADD NEW KNOWLEDGE.
-
-YOU ONLY TRANSFORM GIVEN INPUT.
-
----
-
-CRITICAL RULE (ABSOLUTE):
-
-You MUST ONLY use topics provided in the input roadmap JSON.
-
-❌ NEVER add new topics
-❌ NEVER add your own programming knowledge
-❌ NEVER introduce Python/JS/Java concepts not present in input
-❌ NEVER expand beyond given roadmap content
-
-If something is missing, you MUST NOT guess or fill it.
-
----
-
-LANGUAGE LOCK RULE (VERY IMPORTANT):
-
-The roadmap is for a SPECIFIC programming language.
-
-- Detect language ONLY from input context (NOT from your assumptions)
-- Do NOT switch languages
-- Do NOT mix languages
-- Do NOT default to Python
-
-If roadmap is JavaScript → only JavaScript concepts/examples
-If Java → only Java concepts/examples
-If Python → only Python concepts/examples
-
----
-
-INPUT FORMAT:
-
-You will receive:
-
-1. A list of roadmap topics
-2. A flag USE_BREAKS (boolean)
-
----
-
-YOUR TASK:
-
-Convert the given roadmap into a structured 30-day learning plan.
-
-BUT STRICTLY FOLLOW THESE RULES:
-
----
-
-CRITICAL TRANSFORMATION RULE:
-
-You are allowed ONLY to:
-
-✔ Reorder given topics
-✔ Split given topics into sub-days
-✔ Expand ONLY within same topic scope
-✔ Break topics into smaller learning steps
-
-You are NOT allowed to:
-
-❌ Add new topics
-❌ Add unrelated concepts
-❌ Introduce external curriculum knowledge
-
----
-
-CRITICAL PACING RULE:
-
-- Spread content across exactly 30 days
-- No speedrunning
-- No compressing topics too much
-- Every day must represent a meaningful step
-
----
-
-STRICT LEARNING RULES:
-
-- Maximum 1 core concept per day
-- Large topics MUST be split across multiple days
-- No mixing unrelated topics in same day
-- Must follow prerequisite order strictly
-
----
-
-TOPIC EXPANSION RULE (SAFE VERSION):
-
-You may ONLY expand topics like this:
-
-Example:
-"Functions" →
-- Functions basics
-- Parameters & return values
-- Higher-order usage (ONLY if applicable in roadmap language)
-- Practical exercises
-
-BUT you MUST NOT add unrelated concepts like OOP if not in input.
-
----
-
-USE_BREAKS RULE:
-
-- If USE_BREAKS = true → allow rest days (max 3)
-- If USE_BREAKS = false → NO rest days allowed
-
----
-
-ANTI-HALLUCINATION RULE (VERY IMPORTANT):
-
-If a concept is NOT in the input roadmap:
-
-❌ Do NOT include it
-❌ Do NOT assume it belongs in beginner curriculum
-❌ Do NOT fill gaps with generic programming knowledge
-
-ONLY use what is explicitly provided.
-
----
-
-OUTPUT FORMAT (STRICT JSON ONLY):
-
-{
-"day_1": ["topic"],
-"day_2": ["topic"],
-...
-"day_30": ["topic"]
-}
-
-RULES:
-
-- Output ONLY valid JSON
-- No explanations
-- No markdown
-- No extra text
-- Exactly 30 days required
-- Must strictly respect input roadmap content
-- No external knowledge injection
-
-Now generate the 30-day plan.
-"""
 
 
 def generate_answer(prompt, promptStructure):
@@ -361,37 +65,9 @@ def createPlan(roadmap):
 
 
 def check_answer(question, user_code):
-    prompt = f"""
-You are a strict but helpful coding evaluator.
-
-TASK:
-You are given a coding question and a user's answer.
-
-Decide if the answer is correct.
-
-RULES:
-- If logic is correct or partially correct → mark as CORRECT
-- If wrong → explain clearly what is wrong and how to fix it
-- Be concise
-- Focus on correctness, not style
-
-OUTPUT FORMAT (STRICT):
-If correct:
-✅ Correct
-
-If incorrect:
-❌ Incorrect
-Explanation: <what is wrong>
-Fix: <how to fix it>
-
-QUESTION:
-{question}
-
-USER CODE:
-{user_code}
-"""
-
-    return generate_answer(prompt, "")
+    return generate_answer(
+        CHECK_ANSWER_PROMPT(question=question, user_code=user_code), ""
+    )
 
 
 wholePlan = ""
@@ -482,6 +158,51 @@ def clean_prac_json(raw: str):
     return raw.strip()
 
 
+def generate_practice_questions(plan, max_retries=3):
+    for attempt in range(max_retries):
+
+        raw = generate_answer(
+            json.dumps(plan),
+            PRACTICE_SYSTEM_PROMPT,
+        )
+
+        try:
+            cleaned = clean_prac_json(raw)
+            data = json.loads(cleaned)
+
+            # ------------------------
+            # Validate structure
+            # ------------------------
+            valid = True
+
+            for day, day_content in data.items():
+
+                # Every day must be a dict
+                if not isinstance(day_content, dict):
+                    valid = False
+                    break
+
+                for topic, questions in day_content.items():
+
+                    # Every topic must have exactly 3 questions
+                    if not isinstance(questions, list) or len(questions) != 3:
+                        valid = False
+                        break
+
+                if not valid:
+                    break
+
+            if valid:
+                return data
+
+        except Exception:
+            pass
+
+    raise ValueError(
+        "Failed to generate valid practice questions after multiple attempts."
+    )
+
+
 # Display plan
 if "plan" in st.session_state:
 
@@ -513,13 +234,12 @@ if "plan" in st.session_state:
         )
 
         cleaned = clean_prac_json(raw)
+        practice_questions = json.loads(cleaned)
 
-        try:
-            st.session_state["practice_questions"] = json.loads(cleaned)
-        except Exception:
-            st.error("LLM returned invalid JSON ❌")
-            st.code(raw)
-            st.stop()
+        print("\n===== GENERATED PRACTICE QUESTIONS =====")
+        print(json.dumps(practice_questions, indent=4))
+
+        st.session_state["practice_questions"] = practice_questions
 
 
 # ----------------------------
@@ -593,7 +313,27 @@ if PracticeQuestions:
 
     day_data = PracticeQuestions[selected_day]
 
-    if not day_data:
+    # Handle theory/setup days
+    if isinstance(day_data, list):
+
+        if len(day_data) == 0:
+            st.info("No coding practice for this day (setup/theory day).")
+            st.stop()
+
+        else:
+            st.error(
+                f"Invalid practice format for {selected_day}. "
+                "Expected a dictionary but received a list."
+            )
+            st.write(day_data)
+            st.stop()
+
+    if not isinstance(day_data, dict):
+        st.error(f"Unexpected format: {type(day_data)}")
+        st.write(day_data)
+        st.stop()
+
+    if len(day_data) == 0:
         st.info("No coding practice for this day (setup/theory day).")
         st.stop()
 
