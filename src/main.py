@@ -323,33 +323,30 @@ def clean_prac_json(raw: str):
 # AI CHECKER
 # ----------------------------
 def check_answer(question, user_code):
-
     prompt = f"""
-You are an expert coding evaluator.
+        You are a strict Python unit test checker.
 
-TASK:
-Check if the user's code correctly solves the given problem.
+        RULES:
+        - Only check if the code satisfies the EXACT requirement
+        - Do NOT judge style or intent
+        - If the condition exists exactly as required → mark CORRECT
+        - If it logically satisfies requirement → mark CORRECT
 
-RULES:
-- If correct or logically correct → respond EXACTLY: ✅ Correct
-- If wrong → explain issue + give fix
-- Be strict but fair
+        QUESTION:
+        {question}
 
-OUTPUT FORMAT:
-Either:
-✅ Correct
+        USER CODE:
+        {user_code}
 
-OR:
-❌ Incorrect
-Explanation: ...
-Fix: ...
+        OUTPUT FORMAT:
+        Either:
+        ✅ Correct
 
-QUESTION:
-{question}
-
-USER CODE:
-{user_code}
-"""
+        OR:
+        ❌ Incorrect
+        Explanation:
+        Fix:
+        """
 
     return generate_answer(prompt, "")
 
@@ -394,11 +391,12 @@ st.header("🧠 Practice Zone (Python / JS / Java)")
 # FORMAT DAY NAME
 # ----------------------------
 def format_day(day_key: str):
+    base = day_key.replace("_", " ").title()
 
     if st.session_state.get(f"done_{day_key}", False):
-        return f"🟩 {day_key.replace('_', ' ').title()} (Done)"
+        return f"{base} (✅ Passed)"
 
-    return day_key.replace("_", " ").title()
+    return base
 
 
 # ----------------------------
@@ -406,7 +404,9 @@ def format_day(day_key: str):
 # ----------------------------
 days = list(PracticeQuestions.keys())
 
-selected_day = st.selectbox("📅 Select a Day", days, format_func=format_day)
+selected_day = st.selectbox(
+    "📅 Select a Day", list(PracticeQuestions.keys()), format_func=format_day
+)
 
 day_data = PracticeQuestions[selected_day]
 
@@ -464,20 +464,16 @@ for topic, questions in day_data.items():
                 if st.button("🧪 Check", key=f"check_{key}"):
 
                     result = check_answer(question, answer)
-
                     st.session_state[result_key] = result
 
+                    # 🔥 recompute progress instantly
+                    correct, total = get_day_progress(day_data, selected_day)
+
+                    if correct == total and total > 0:
+                        st.session_state[f"done_{selected_day}"] = True
+                        st.rerun()
+
                     show_result(result)
-
-            # ------------------------
-            # CLEAR BUTTON
-            # ------------------------
-            with col2:
-                if st.button("🧹 Clear", key=f"clear_{key}"):
-
-                    st.session_state[key] = ""
-                    st.session_state[result_key] = ""
-                    st.rerun()
 
 
 # ----------------------------
