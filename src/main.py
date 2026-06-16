@@ -402,15 +402,46 @@ st.set_page_config(page_title="SkillForge", page_icon="🚀", layout="wide")
 st.title("🚀 SkillForge")
 st.write("Generate a personalized 30-day programming roadmap.")
 
+
+def get_level(xp):
+    if xp < 100:
+        return "🌱 Beginner"
+    elif xp < 300:
+        return "⚡ Apprentice"
+    elif xp < 600:
+        return "🔥 Intermediate"
+    elif xp < 1000:
+        return "🚀 Advanced"
+    else:
+        return "👑 SkillForge Master"
+
+
 # Sidebar
 with st.sidebar:
-    st.header("Settings")
+    st.header("User Input")
 
     language = st.selectbox(
         "Programming Language", ["Python", "JavaScript", "Java", "C++", "Go"]
     )
 
     generate = st.button("Generate Plan", use_container_width=True)
+
+    with st.expander("📊 Your Stats"):
+
+        st.metric("XP", st.session_state.get("xp", 0))
+
+        st.write(f"Level: {get_level(st.session_state.get('xp', 0))}")
+
+        passed_days = len(
+            [
+                key
+                for key, value in st.session_state.items()
+                if key.startswith("done_day_") and value
+            ]
+        )
+
+        st.metric("Days Completed", f"{passed_days}/30")
+
 
 currentlyChosenLanguage = ""
 
@@ -433,6 +464,8 @@ if generate:
     # Save plan so it survives reruns
     st.session_state["plan"] = wholePlan
     st.session_state["language"] = language
+    if "xp" not in st.session_state:
+        st.session_state["xp"] = 0
 
 
 # ----------------------------
@@ -581,6 +614,11 @@ if PracticeQuestions:
                 result = st.session_state.get(result_key, "")
 
                 if "✅ Correct" in result:
+                    if not st.session_state.get(f"xp_awarded_{result_key}", False):
+
+                        st.session_state["xp"] += 10
+                        st.session_state[f"xp_awarded_{result_key}"] = True
+                        st.rerun()
                     correct += 1
 
                 total += 1
