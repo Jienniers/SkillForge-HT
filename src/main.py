@@ -280,6 +280,20 @@ if generate:
     st.session_state["language"] = language
 
 
+# ----------------------------
+# JSON CLEANER
+# ----------------------------
+def clean_prac_json(raw: str):
+    if not raw:
+        return "{}"
+
+    raw = raw.strip()
+    raw = re.sub(r"```json", "", raw)
+    raw = re.sub(r"```", "", raw)
+
+    return raw.strip()
+
+
 # Display plan
 if "plan" in st.session_state:
 
@@ -304,19 +318,20 @@ if "plan" in st.session_state:
                     else:
                         st.write(f"✅ {topic}")
 
+    if st.button("🧠 Generate Practice Questions"):
 
-# ----------------------------
-# JSON CLEANER
-# ----------------------------
-def clean_prac_json(raw: str):
-    if not raw:
-        return "{}"
+        raw = generate_answer(
+            json.dumps(st.session_state["plan"]), PRACTICE_SYSTEM_PROMPT
+        )
 
-    raw = raw.strip()
-    raw = re.sub(r"```json", "", raw)
-    raw = re.sub(r"```", "", raw)
+        cleaned = clean_prac_json(raw)
 
-    return raw.strip()
+        try:
+            st.session_state["practice_questions"] = json.loads(cleaned)
+        except Exception:
+            st.error("LLM returned invalid JSON ❌")
+            st.code(raw)
+            st.stop()
 
 
 # ----------------------------
@@ -359,128 +374,110 @@ def show_result(text):
     st.markdown(text)
 
 
-# ----------------------------
-# GENERATE ONCE (CACHE)
-# ----------------------------
-if "practice_questions" not in st.session_state:
+PracticeQuestions = st.session_state.get("practice_questions", None)
 
-    raw = generate_answer(json.dumps(wholePlan), PRACTICE_SYSTEM_PROMPT)
-
-    cleaned = clean_prac_json(raw)
-
-    try:
-        st.session_state["practice_questions"] = json.loads(cleaned)
-
-    except Exception:
-        st.error("LLM returned invalid JSON ❌")
-        st.code(raw)
-        st.stop()
+if PracticeQuestions:
+    # ----------------------------
+    # HEADER
+    # ----------------------------
+    st.divider()
+    st.header("🧠 Practice Zone (Python / JS / Java)")
 
 
-PracticeQuestions = st.session_state["practice_questions"]
+    # ----------------------------
+    # FORMAT DAY NAME
+    # ----------------------------
+    def format_day(day_key: str):
+        base = day_key.replace("_", " ").title()
+
+        if st.session_state.get(f"done_{day_key}", False):
+            return f"{base} (✅ Passed)"
+
+        return base
 
 
-# ----------------------------
-# HEADER
-# ----------------------------
-st.divider()
-st.header("🧠 Practice Zone (Python / JS / Java)")
+    # ----------------------------
+    # DAY SELECTOR
+    # ----------------------------
+    days = list(PracticeQuestions.keys())
+
+    selected_day = st.selectbox(
+        "📅 Select a Day", list(PracticeQuestions.keys()), format_func=format_day
+    )
+
+    day_data = PracticeQuestions[selected_day]
+
+    st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
 
 
-# ----------------------------
-# FORMAT DAY NAME
-# ----------------------------
-def format_day(day_key: str):
-    base = day_key.replace("_", " ").title()
+    # ----------------------------
+    # TRACK DAY PROGRESS
+    # ----------------------------
+    def get_day_progress(day_data, day_key):
 
-    if st.session_state.get(f"done_{day_key}", False):
-        return f"{base} (✅ Passed)"
+        total = 0
+        correct = 0
 
-    return base
+        for topic, questions in day_data.items():
+            for i, q in enumerate(questions):
 
+                result_key = f"result_{day_key}_{topic}_{i}"
+                result = st.session_state.get(result_key, "")
 
-# ----------------------------
-# DAY SELECTOR
-# ----------------------------
-days = list(PracticeQuestions.keys())
+                if "✅ Correct" in result:
+                    correct += 1
 
-selected_day = st.selectbox(
-    "📅 Select a Day", list(PracticeQuestions.keys()), format_func=format_day
-)
+                total += 1
 
-day_data = PracticeQuestions[selected_day]
-
-st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
+        return correct, total
 
 
-# ----------------------------
-# TRACK DAY PROGRESS
-# ----------------------------
-def get_day_progress(day_data, day_key):
-
-    total = 0
-    correct = 0
-
+    # ----------------------------
+    # QUESTIONS UI
+    # ----------------------------
     for topic, questions in day_data.items():
-        for i, q in enumerate(questions):
 
-            result_key = f"result_{day_key}_{topic}_{i}"
-            result = st.session_state.get(result_key, "")
+        with st.expander(f"📌 {topic}"):
 
-            if "✅ Correct" in result:
-                correct += 1
+            for i, question in enumerate(questions):
 
-            total += 1
+                st.markdown(f"### ❓ Question {i + 1}")
+                st.write(question)
 
-    return correct, total
+                key = f"{selected_day}_{topic}_{i}"
+                result_key = f"result_{selected_day}_{topic}_{i}"
 
+                # ------------------------
+                # ANSWER INPUT
+                # ------------------------
+                answer = st.text_area("✍️ Your Code", key=key, height=120)
 
-# ----------------------------
-# QUESTIONS UI
-# ----------------------------
-for topic, questions in day_data.items():
+                col1, col2 = st.columns(2)
 
-    with st.expander(f"📌 {topic}"):
+                # ------------------------
+                # CHECK BUTTON (AI)
+                # ------------------------
+                with col1:
+                    if st.button("🧪 Check", key=f"check_{key}"):
 
-        for i, question in enumerate(questions):
+                        result = check_answer(question, answer)
+                        st.session_state[result_key] = result
 
-            st.markdown(f"### ❓ Question {i + 1}")
-            st.write(question)
+                        # 🔥 recompute progress instantly
+                        correct, total = get_day_progress(day_data, selected_day)
 
-            key = f"{selected_day}_{topic}_{i}"
-            result_key = f"result_{selected_day}_{topic}_{i}"
+                        if correct == total and total > 0:
+                            st.session_state[f"done_{selected_day}"] = True
+                            st.rerun()
 
-            # ------------------------
-            # ANSWER INPUT
-            # ------------------------
-            answer = st.text_area("✍️ Your Code", key=key, height=120)
-
-            col1, col2 = st.columns(2)
-
-            # ------------------------
-            # CHECK BUTTON (AI)
-            # ------------------------
-            with col1:
-                if st.button("🧪 Check", key=f"check_{key}"):
-
-                    result = check_answer(question, answer)
-                    st.session_state[result_key] = result
-
-                    # 🔥 recompute progress instantly
-                    correct, total = get_day_progress(day_data, selected_day)
-
-                    if correct == total and total > 0:
-                        st.session_state[f"done_{selected_day}"] = True
-                        st.rerun()
-
-                    show_result(result)
+                        show_result(result)
 
 
-# ----------------------------
-# MARK DAY COMPLETE
-# ----------------------------
-correct, total = get_day_progress(day_data, selected_day)
+    # ----------------------------
+    # MARK DAY COMPLETE
+    # ----------------------------
+    correct, total = get_day_progress(day_data, selected_day)
 
-if total > 0 and correct == total:
-    st.success("🏁 Day Completed!")
-    st.session_state[f"done_{selected_day}"] = True
+    if total > 0 and correct == total:
+        st.success("🏁 Day Completed!")
+        st.session_state[f"done_{selected_day}"] = True
