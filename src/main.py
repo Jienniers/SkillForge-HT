@@ -102,21 +102,24 @@ with st.sidebar:
 
     generate = st.button("Generate Plan", use_container_width=True)
 
-    with st.expander("📊 Your Stats"):
+    st.header("📊 Your Stats")
 
-        st.metric("XP", st.session_state.get("xp", 0))
+    st.metric("XP", st.session_state.get("xp", 0))
 
-        st.write(f"Level: {get_level(st.session_state.get('xp', 0))}")
+    st.write(f"Level: {get_level(st.session_state.get('xp', 0))}")
 
-        passed_days = len(
-            [
-                key
-                for key, value in st.session_state.items()
-                if key.startswith("done_day_") and value
-            ]
-        )
+    passed_days = len(
+        [
+            key
+            for key, value in st.session_state.items()
+            if key.startswith("done_day_") and value
+        ]
+    )
 
-        st.metric("Days Completed", f"{passed_days}/30")
+    st.metric("Days Completed", f"{passed_days}/30")
+
+    if st.button("Refresh", use_container_width=True):
+        st.rerun()
 
 
 currentlyChosenLanguage = ""
@@ -405,14 +408,48 @@ if PracticeQuestions:
                         result = check_answer(question, answer)
                         st.session_state[result_key] = result
 
-                        # 🔥 recompute progress instantly
+                        is_correct = ("Correct" in result) or ("✅" in result)
+
+                        xp_message = "❌ Try again"
+
+                        if is_correct:
+                            xp_key = f"xp_awarded_{result_key}"
+
+                            if not st.session_state.get(xp_key, False):
+                                st.session_state["xp"] = (
+                                    st.session_state.get("xp", 0) + 10
+                                )
+                                st.session_state[xp_key] = True
+
+                            xp_message = "🏆 Correct! +10 XP"
+                            st.toast(xp_message)
+
+                        else:
+                            st.toast(xp_message)
+
+                        # recompute progress
                         correct, total = get_day_progress(day_data, selected_day)
 
-                        if correct == total and total > 0:
+                        if total > 0 and correct == total:
                             st.session_state[f"done_{selected_day}"] = True
-                            st.rerun()
 
-                        show_result(result)
+                        # store feedback for optional UI display
+                        st.session_state[f"feedback_{result_key}"] = {
+                            "type": "success" if is_correct else "warning",
+                            "message": xp_message,
+                            "result": result,
+                        }
+
+                # feedback = st.session_state.get(f"feedback_{result_key}")
+
+                # if feedback:
+                #     if feedback["type"] == "success":
+                #         st.success(feedback["message"])
+                #     else:
+                #         st.warning(feedback["message"])
+
+                #     st.markdown("### 🧠 Feedback")
+                #     st.write(feedback["result"])
 
     # ----------------------------
     # MARK DAY COMPLETE
