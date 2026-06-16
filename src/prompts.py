@@ -120,10 +120,11 @@ You MUST ONLY use topics provided in the input roadmap JSON.
 
 ❌ NEVER add new topics
 ❌ NEVER add your own programming knowledge
-❌ NEVER introduce Python/JS/Java concepts not present in input
-❌ NEVER expand beyond given roadmap content
+❌ NEVER introduce concepts not present in input
+❌ NEVER assume missing curriculum content
+❌ NEVER fill gaps with general programming knowledge
 
-If something is missing, you MUST NOT guess or fill it.
+If something is missing, you MUST NOT guess or invent it.
 
 ---
 
@@ -131,23 +132,21 @@ LANGUAGE LOCK RULE (VERY IMPORTANT):
 
 The roadmap is for a SPECIFIC programming language.
 
-- Detect language ONLY from input context (NOT from your assumptions)
+- Detect language ONLY from input context
 - Do NOT switch languages
 - Do NOT mix languages
 - Do NOT default to Python
 
-If roadmap is JavaScript → only JavaScript concepts/examples
-If Java → only Java concepts/examples
-If Python → only Python concepts/examples
+If roadmap is JavaScript → ONLY JavaScript syntax and context  
+If roadmap is Java → ONLY Java context  
+If roadmap is Python → ONLY Python context  
 
 ---
 
 INPUT FORMAT:
 
 You will receive:
-
-1. A list of roadmap topics
-2. A flag USE_BREAKS (boolean)
+- A list of roadmap topics
 
 ---
 
@@ -155,64 +154,61 @@ YOUR TASK:
 
 Convert the given roadmap into a structured 30-day learning plan.
 
-BUT STRICTLY FOLLOW THESE RULES:
+---
+
+CRITICAL REQUIREMENT (HARD CONSTRAINT):
+
+YOU MUST ALWAYS OUTPUT EXACTLY 30 DAYS.
+
+- No more
+- No less
+- No missing days allowed
+- Every day must exist in final output
 
 ---
 
-CRITICAL TRANSFORMATION RULE:
+STRICT COMPLETION RULE:
+
+If the input roadmap is too small:
+
+YOU MUST STRETCH IT ACROSS ALL 30 DAYS.
 
 You are allowed ONLY to:
-
-✔ Reorder given topics
-✔ Split given topics into sub-days
-✔ Expand ONLY within same topic scope
 ✔ Break topics into smaller learning steps
+✔ Split topics into multiple progressive stages
+✔ Spread practice and reinforcement across days
+✔ Revisit SAME topic in deeper form (only if necessary)
 
-You are NOT allowed to:
+BUT:
 
-❌ Add new topics
-❌ Add unrelated concepts
-❌ Introduce external curriculum knowledge
-
----
-
-CRITICAL PACING RULE:
-
-- Spread content across exactly 30 days
-- No speedrunning
-- No compressing topics too much
-- Every day must represent a meaningful step
+❌ Do NOT introduce new topics
+❌ Do NOT leave empty days
+❌ Do NOT skip days
+❌ Do NOT compress into fewer days
 
 ---
 
-STRICT LEARNING RULES:
+TOPIC EXPANSION RULE:
 
-- Maximum 1 core concept per day
-- Large topics MUST be split across multiple days
-- No mixing unrelated topics in same day
-- Must follow prerequisite order strictly
-
----
-
-TOPIC EXPANSION RULE (SAFE VERSION):
-
-You may ONLY expand topics like this:
+Allowed expansion ONLY within same topic:
 
 Example:
 "Functions" →
 - Functions basics
 - Parameters & return values
-- Higher-order usage (ONLY if applicable in roadmap language)
-- Practical exercises
+- Practical usage
+- Advanced usage (ONLY if part of same topic scope)
 
-BUT you MUST NOT add unrelated concepts like OOP if not in input.
+❌ Do NOT introduce unrelated topics like OOP unless explicitly in input
 
 ---
 
-USE_BREAKS RULE:
+LEARNING STRUCTURE RULE:
 
-- If USE_BREAKS = true → allow rest days (max 3)
-- If USE_BREAKS = false → NO rest days allowed
+- Maximum 1 core concept per day
+- Large topics MUST be spread across multiple days
+- Must follow logical prerequisite order
+- Each day must represent a small progression step
 
 ---
 
@@ -220,11 +216,19 @@ ANTI-HALLUCINATION RULE (VERY IMPORTANT):
 
 If a concept is NOT in the input roadmap:
 
-❌ Do NOT include it
-❌ Do NOT assume it belongs in beginner curriculum
-❌ Do NOT fill gaps with generic programming knowledge
+❌ Do NOT include it  
+❌ Do NOT assume it belongs  
+❌ Do NOT add external curriculum knowledge  
 
-ONLY use what is explicitly provided.
+ONLY transform what is given.
+
+---
+
+BALANCING RULE:
+
+- Spread topics evenly across 30 days
+- Avoid clustering similar difficulty days together
+- Ensure gradual progression from simple → complex within given topics
 
 ---
 
@@ -237,15 +241,17 @@ OUTPUT FORMAT (STRICT JSON ONLY):
 "day_30": ["topic"]
 }
 
+---
+
 RULES:
 
 - Output ONLY valid JSON
 - No explanations
 - No markdown
 - No extra text
-- Exactly 30 days required
-- Must strictly respect input roadmap content
-- No external knowledge injection
+- Must always return exactly 30 days
+- Must strictly use only input roadmap content
+- Must not hallucinate any new topics
 
 Now generate the 30-day plan.
 """
