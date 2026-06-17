@@ -218,6 +218,75 @@ def generate_practice_questions(plan, max_retries=3):
     )
 
 
+from io import BytesIO
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+
+
+def generate_roadmap_pdf_bytes(plan):
+
+    buffer = BytesIO()  # 👈 MEMORY FILE
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=30,
+        leftMargin=30,
+        topMargin=30,
+        bottomMargin=30,
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        "TitleStyle",
+        parent=styles["Title"],
+        fontSize=20,
+        textColor=colors.HexColor("#4B7BEC"),
+        spaceAfter=20,
+    )
+
+    day_style = ParagraphStyle(
+        "DayStyle",
+        parent=styles["Heading2"],
+        fontSize=14,
+        textColor=colors.black,
+        spaceAfter=10,
+    )
+
+    topic_style = ParagraphStyle(
+        "TopicStyle",
+        parent=styles["Normal"],
+        fontSize=11,
+        spaceAfter=5,
+    )
+
+    content = []
+
+    content.append(Paragraph("🚀 SkillForge Roadmap", title_style))
+    content.append(Spacer(1, 10))
+
+    for day, topics in plan.items():
+
+        content.append(Paragraph(day.replace("_", " ").title(), day_style))
+
+        if not topics:
+            content.append(Paragraph("😴 Rest / Theory Day", topic_style))
+        else:
+            for t in topics:
+                content.append(Paragraph(f"• {t}", topic_style))
+
+        content.append(Spacer(1, 10))
+
+    doc.build(content)
+
+    buffer.seek(0)  # 👈 rewind for download
+
+    return buffer
+
+
 # Display plan
 if "plan" in st.session_state:
 
@@ -242,19 +311,35 @@ if "plan" in st.session_state:
                     else:
                         st.write(f"✅ {topic}")
 
-    if st.button("🧠 Generate Practice Questions"):
+    # -----------------------------
+    # BUTTON ROW (SIDE BY SIDE)
+    # -----------------------------
+    btn_col1, btn_col2, btn_spacer = st.columns([2, 2, 6])
 
-        raw = generate_answer(
-            json.dumps(st.session_state["plan"]), PRACTICE_SYSTEM_PROMPT
+    with btn_col1:
+        if st.button("🧠 Generate Practice Questions"):
+
+            raw = generate_answer(
+                json.dumps(st.session_state["plan"]), PRACTICE_SYSTEM_PROMPT
+            )
+
+            cleaned = clean_prac_json(raw)
+            practice_questions = json.loads(cleaned)
+
+            print("\n===== GENERATED PRACTICE QUESTIONS =====")
+            print(json.dumps(practice_questions, indent=4))
+
+            st.session_state["practice_questions"] = practice_questions
+
+    with btn_col2:
+        pdf_buffer = generate_roadmap_pdf_bytes(st.session_state["plan"])
+
+        st.download_button(
+            label="📄 Download Roadmap PDF",
+            data=pdf_buffer,
+            file_name="SkillForge_Roadmap.pdf",
+            mime="application/pdf",
         )
-
-        cleaned = clean_prac_json(raw)
-        practice_questions = json.loads(cleaned)
-
-        print("\n===== GENERATED PRACTICE QUESTIONS =====")
-        print(json.dumps(practice_questions, indent=4))
-
-        st.session_state["practice_questions"] = practice_questions
 
 
 # ----------------------------
