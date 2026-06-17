@@ -2,7 +2,6 @@ from openai import OpenAI
 import json
 import streamlit as st
 import re
-import streamlit.components.v1 as components
 from streamlit_ace import st_ace
 from prompts import (
     PRACTICE_SYSTEM_PROMPT,
@@ -128,11 +127,39 @@ with st.sidebar:
     st.progress(progress)
 
     if st.button("Refresh", use_container_width=True):
+        st.session_state["selected_day"] = "day_1"
         st.rerun()
+
+
+def reset_learning_session():
+    prefixes = [
+        "done_",
+        "result_",
+        "xp_awarded_",
+        "feedback_",
+        "hint_",
+    ]
+
+    for key in list(st.session_state.keys()):
+        if any(key.startswith(prefix) for prefix in prefixes):
+            del st.session_state[key]
+
+    for key in [
+        "practice_questions",
+        "achievements",
+        "bonus_given",
+        "plan",
+        "selected_day",
+        "language",
+    ]:
+        st.session_state.pop(key, None)
+
+    st.session_state["xp"] = 0
 
 
 # Generate plan when button is clicked
 if generate:
+    reset_learning_session()
     selected_language = language.lower()
     st.session_state["language"] = selected_language
     roadmap = roadmapExtract(selected_language)
@@ -435,7 +462,10 @@ if PracticeQuestions:
     days = list(PracticeQuestions.keys())
 
     selected_day = st.selectbox(
-        "📅 Select a Day", list(PracticeQuestions.keys()), format_func=format_day
+        "📅 Select a Day",
+        list(PracticeQuestions.keys()),
+        format_func=format_day,
+        key="selected_day",
     )
 
     day_data = PracticeQuestions[selected_day]
