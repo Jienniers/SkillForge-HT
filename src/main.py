@@ -2,6 +2,7 @@ from openai import OpenAI
 import json
 import streamlit as st
 import re
+import streamlit.components.v1 as components
 from streamlit_ace import st_ace
 from prompts import PRACTICE_SYSTEM_PROMPT, PLAN, CHECK_ANSWER_PROMPT
 
@@ -117,6 +118,10 @@ with st.sidebar:
     )
 
     st.metric("Days Completed", f"{passed_days}/30")
+
+    progress = passed_days / 30
+
+    st.progress(progress)
 
     if st.button("Refresh", use_container_width=True):
         st.rerun()
@@ -276,14 +281,12 @@ def check_answer(question, user_code):
 
     return generate_answer(prompt, "")
 
-
 # ----------------------------
 # POPUP RESULT
 # ----------------------------
 @st.dialog("Result")
 def show_result(text):
     st.markdown(text)
-
 
 PracticeQuestions = st.session_state.get("practice_questions", None)
 
@@ -440,16 +443,9 @@ if PracticeQuestions:
                             "result": result,
                         }
 
-                # feedback = st.session_state.get(f"feedback_{result_key}")
+                # with col2:
+                #     if st.button("💡 Hint"):
 
-                # if feedback:
-                #     if feedback["type"] == "success":
-                #         st.success(feedback["message"])
-                #     else:
-                #         st.warning(feedback["message"])
-
-                #     st.markdown("### 🧠 Feedback")
-                #     st.write(feedback["result"])
 
     # ----------------------------
     # MARK DAY COMPLETE
