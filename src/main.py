@@ -78,9 +78,6 @@ def check_answer(question, user_code):
     )
 
 
-wholePlan = ""
-
-
 st.set_page_config(page_title="SkillForge", page_icon="🚀", layout="wide")
 
 st.title("🚀 SkillForge")
@@ -134,27 +131,23 @@ with st.sidebar:
         st.rerun()
 
 
-currentlyChosenLanguage = ""
-
 # Generate plan when button is clicked
 if generate:
-    currentlyChosenLanguage = language.lower()
-    roadmap = roadmapExtract(currentlyChosenLanguage)
+    selected_language = language.lower()
+    st.session_state["language"] = selected_language
+    roadmap = roadmapExtract(selected_language)
 
-    wholePlan = createPlan(roadmap)
+    st.session_state["plan"] = createPlan(roadmap)
 
     # Convert to dict if AI returned JSON string
-    if isinstance(wholePlan, str):
+    if isinstance(st.session_state["plan"], str):
         try:
-            wholePlan = json.loads(wholePlan)
+            st.session_state["plan"] = json.loads(st.session_state["plan"])
         except json.JSONDecodeError:
             st.error("The AI did not return valid JSON.")
-            st.code(wholePlan)
+            st.code(st.session_state["plan"])
             st.stop()
 
-    # Save plan so it survives reruns
-    st.session_state["plan"] = wholePlan
-    st.session_state["language"] = language
     if "xp" not in st.session_state:
         st.session_state["xp"] = 0
 
@@ -490,7 +483,7 @@ if PracticeQuestions:
 
                 answer = st_ace(
                     value=st.session_state.get(key, ""),
-                    language=currentlyChosenLanguage,
+                    language=st.session_state["language"],
                     theme="monokai",
                     height=250,
                     key=f"ace_{key}",
