@@ -4,7 +4,14 @@ import streamlit as st
 import re
 import streamlit.components.v1 as components
 from streamlit_ace import st_ace
-from prompts import PRACTICE_SYSTEM_PROMPT, PLAN, CHECK_ANSWER_PROMPT
+from prompts import (
+    PRACTICE_SYSTEM_PROMPT,
+    PLAN,
+    CHECK_ANSWER_PROMPT,
+    HINT_SYSTEM_PROMPT,
+    HINT_LEVEL_1,
+    HINT_LEVEL_2,
+)
 
 jsonRoadmapFile = "./data/roadmap.json"
 
@@ -281,12 +288,14 @@ def check_answer(question, user_code):
 
     return generate_answer(prompt, "")
 
+
 # ----------------------------
 # POPUP RESULT
 # ----------------------------
 @st.dialog("Result")
-def show_result(text):
+def show_popup(text):
     st.markdown(text)
+
 
 PracticeQuestions = st.session_state.get("practice_questions", None)
 
@@ -386,6 +395,9 @@ if PracticeQuestions:
                 key = f"{selected_day}_{topic}_{i}"
                 result_key = f"result_{selected_day}_{topic}_{i}"
 
+                hint_key = f"hint_stage_{selected_day}_{topic}_{i}"
+                hint_stage = st.session_state.get(hint_key, 0)
+
                 # ------------------------
                 # ANSWER INPUT
                 # ------------------------
@@ -400,10 +412,10 @@ if PracticeQuestions:
                     auto_update=True,
                 )
 
-                col1, col2 = st.columns(2)
+                col1, col_spacer, col2 = st.columns([2, 6, 2])
 
                 # ------------------------
-                # CHECK BUTTON (AI)
+                # CHECK BUTTON
                 # ------------------------
                 with col1:
                     if st.button("🧪 Check", key=f"check_{key}"):
@@ -411,41 +423,52 @@ if PracticeQuestions:
                         result = check_answer(question, answer)
                         st.session_state[result_key] = result
 
-                        is_correct = ("Correct" in result) or ("✅" in result)
-
-                        xp_message = "❌ Try again"
-
-                        if is_correct:
-                            xp_key = f"xp_awarded_{result_key}"
-
-                            if not st.session_state.get(xp_key, False):
-                                st.session_state["xp"] = (
-                                    st.session_state.get("xp", 0) + 10
-                                )
-                                st.session_state[xp_key] = True
-
-                            xp_message = "🏆 Correct! +10 XP"
-                            st.toast(xp_message)
-
-                        else:
-                            st.toast(xp_message)
-
-                        # recompute progress
                         correct, total = get_day_progress(day_data, selected_day)
 
-                        if total > 0 and correct == total:
+                        if correct == total and total > 0:
                             st.session_state[f"done_{selected_day}"] = True
+                            st.rerun()
 
-                        # store feedback for optional UI display
-                        st.session_state[f"feedback_{result_key}"] = {
-                            "type": "success" if is_correct else "warning",
-                            "message": xp_message,
-                            "result": result,
-                        }
+                        show_popup(result)
 
-                # with col2:
-                #     if st.button("💡 Hint"):
+                # ------------------------
+                # HINT BUTTONS (RIGHT SIDE)
+                # ------------------------
+                with col2:
 
+                    hint_col1, hint_col2 = st.columns(2)
+
+                    # ---------------- Hint 1 ----------------
+                    with hint_col1:
+                        if st.button(
+                            "💡 Hint 1", key=f"hint1_{selected_day}_{topic}_{i}"
+                        ):
+
+                            hint = generate_answer(
+                                HINT_LEVEL_1(question), HINT_SYSTEM_PROMPT
+                            )
+                            st.session_state[f"hint_{key}_1"] = hint
+
+                    # ---------------- Hint 2 ----------------
+                    with hint_col2:
+                        if st.button(
+                            "🧠 Hint 2 (-5 XP)", key=f"hint2_{selected_day}_{topic}_{i}"
+                        ):
+
+                            hint = generate_answer(
+                                HINT_LEVEL_2(question), HINT_SYSTEM_PROMPT
+                            )
+                            st.session_state[f"hint_{key}_2"] = hint
+                            st.session_state["xp"] -= 5
+
+                # ------------------------
+                # DISPLAY HINTS (below buttons)
+                # ------------------------
+                if f"hint_{key}_1" in st.session_state:
+                    st.info(st.session_state[f"hint_{key}_1"])
+
+                if f"hint_{key}_2" in st.session_state:
+                    st.warning(st.session_state[f"hint_{key}_2"])
 
     # ----------------------------
     # MARK DAY COMPLETE
