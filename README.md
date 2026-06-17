@@ -65,6 +65,16 @@ Python is the core engine of SkillForge:
 
 ---
 
+## 🖼️ Screenshots
+
+![Main Page](/Screenshots/Screenshot1.png)
+![Correct Answer Page](/Screenshots/Screenshot2.png)
+![Day Completed Page](/Screenshots/Screenshot3.png)
+
+
+
+---
+
 ## ⚙️ Key Features
 
 ### 🎯 AI-Generated Learning Roadmap
