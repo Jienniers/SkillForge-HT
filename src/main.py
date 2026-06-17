@@ -144,10 +144,6 @@ def reset_learning_session():
         if any(key.startswith(prefix) for prefix in prefixes):
             del st.session_state[key]
 
-    for key in list(st.session_state.keys()):
-        if any(key.startswith("done_")):
-            st.session_state.set(key, False)
-
     for key in [
         "practice_questions",
         "achievements",
@@ -181,6 +177,7 @@ if generate:
 
     if "xp" not in st.session_state:
         st.session_state["xp"] = 0
+    st.rerun()
 
 
 # ----------------------------
@@ -500,7 +497,7 @@ if PracticeQuestions:
         st.stop()
 
     st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
-    #selected_day = selected_day.replace("day_", "").lower()
+    # selected_day = selected_day.replace("day_", "").lower()
 
     # ----------------------------
     # TRACK DAY PROGRESS
@@ -607,13 +604,14 @@ if PracticeQuestions:
                         if st.button(
                             "🧠 Hint 2 (-5 XP)", key=f"hint2_{selected_day}_{topic}_{i}"
                         ):
-
-                            hint = generate_answer(
-                                HINT_LEVEL_2(question), HINT_SYSTEM_PROMPT
-                            )
-                            st.session_state[f"hint_{key}_2"] = hint
-                            st.session_state["xp"] -= 5
-
+                            if st.session_state["xp"] <= 5:
+                                st.error("You don't have enough XP to use this hint!")
+                            else:
+                                hint = generate_answer(
+                                    HINT_LEVEL_2(question), HINT_SYSTEM_PROMPT
+                                )
+                                st.session_state[f"hint_{key}_2"] = hint
+                                st.session_state["xp"] -= 5
                 # ------------------------
                 # DISPLAY HINTS (below buttons)
                 # ------------------------
