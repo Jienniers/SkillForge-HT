@@ -375,6 +375,40 @@ def show_popup(text):
     st.markdown(text)
 
 
+def check_achievements(selected_day):
+    selected_day = int(selected_day)
+    bonus_given = set(st.session_state.get("bonus_given", []))
+
+    completed_days = len(
+        [k for k, v in st.session_state.items() if k.startswith("done_") and v]
+    )
+
+    print("Completed Days:", completed_days)
+    print("Bonus Given:", bonus_given)
+    print("Selected Day:", selected_day)
+
+    # FIRST DAY
+    if selected_day == 1 and selected_day not in bonus_given:
+        st.session_state["xp"] += 10
+        st.toast("🏆 First Day Completed! +10 XP Bonus", icon="🎉")
+        st.balloons()
+
+        bonus_given.add(selected_day)
+
+    # LAST DAY
+    if selected_day == 30 and selected_day not in bonus_given:
+
+        if completed_days < 29:
+            st.toast("⛔ Complete previous 29 days first!", icon="⚠️")
+            return
+
+        st.session_state["xp"] += 50
+        st.toast("👑 Final Day Completed! +50 XP Bonus", icon="🔥")
+        st.balloons()
+
+        bonus_given.add(selected_day)
+
+
 PracticeQuestions = st.session_state.get("practice_questions", None)
 
 if PracticeQuestions:
@@ -431,6 +465,7 @@ if PracticeQuestions:
         st.stop()
 
     st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
+    selected_day = selected_day.replace("day_", "").lower()
 
     # ----------------------------
     # TRACK DAY PROGRESS
@@ -451,7 +486,6 @@ if PracticeQuestions:
 
                         st.session_state["xp"] += 10
                         st.session_state[f"xp_awarded_{result_key}"] = True
-                        st.rerun()
                     correct += 1
 
                 total += 1
@@ -505,7 +539,7 @@ if PracticeQuestions:
 
                         if correct == total and total > 0:
                             st.session_state[f"done_{selected_day}"] = True
-                            st.rerun()
+                            check_achievements(selected_day)
 
                         show_popup(result)
 
