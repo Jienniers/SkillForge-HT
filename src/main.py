@@ -144,6 +144,10 @@ def reset_learning_session():
         if any(key.startswith(prefix) for prefix in prefixes):
             del st.session_state[key]
 
+    for key in list(st.session_state.keys()):
+        if any(key.startswith("done_")):
+            st.session_state.set(key, False)
+
     for key in [
         "practice_questions",
         "achievements",
@@ -403,6 +407,7 @@ def show_popup(text):
 
 
 def check_achievements(selected_day):
+    selected_day = selected_day.replace("day_", "").lower()
     selected_day = int(selected_day)
     bonus_given = set(st.session_state.get("bonus_given", []))
 
@@ -495,7 +500,7 @@ if PracticeQuestions:
         st.stop()
 
     st.subheader(f"📘 {selected_day.replace('_', ' ').title()}")
-    selected_day = selected_day.replace("day_", "").lower()
+    #selected_day = selected_day.replace("day_", "").lower()
 
     # ----------------------------
     # TRACK DAY PROGRESS
@@ -568,8 +573,14 @@ if PracticeQuestions:
                         correct, total = get_day_progress(day_data, selected_day)
 
                         if correct == total and total > 0:
-                            st.session_state[f"done_{selected_day}"] = True
-                            check_achievements(selected_day)
+                            if not st.session_state.get(f"done_{selected_day}", False):
+
+                                st.session_state[f"done_{selected_day}"] = True
+
+                                check_achievements(selected_day)
+
+                                st.toast("🏁 Day Completed!", icon="🎉")
+                                st.balloons()
 
                         show_popup(result)
 
