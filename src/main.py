@@ -1,15 +1,24 @@
-from openai import OpenAI
+import base64
 import json
-import streamlit as st
 import re
+from io import BytesIO
+
+import streamlit as st
+import streamlit.components.v1 as components
+from openai import OpenAI
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 from streamlit_ace import st_ace
+
 from prompts import (
-    PRACTICE_SYSTEM_PROMPT,
-    PLAN,
     CHECK_ANSWER_PROMPT,
-    HINT_SYSTEM_PROMPT,
     HINT_LEVEL_1,
     HINT_LEVEL_2,
+    HINT_SYSTEM_PROMPT,
+    PLAN,
+    PRACTICE_SYSTEM_PROMPT,
 )
 
 jsonRoadmapFile = "./data/roadmap.json"
@@ -66,15 +75,9 @@ def createPlan(roadmap):
 
     try:
         return json.loads(cleaned)
-    except Exception as e:
+    except Exception:
         print("RAW OUTPUT:\n", raw)
         raise ValueError("Model returned invalid JSON")
-
-
-def check_answer(question, user_code):
-    return generate_answer(
-        CHECK_ANSWER_PROMPT(question=question, user_code=user_code), ""
-    )
 
 
 st.set_page_config(page_title="SkillForge", page_icon="🚀", layout="wide")
@@ -239,13 +242,6 @@ def generate_practice_questions(plan, max_retries=3):
     )
 
 
-from io import BytesIO
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
-
-
 def generate_roadmap_pdf_bytes(plan):
 
     buffer = BytesIO()  # 👈 MEMORY FILE
@@ -367,32 +363,7 @@ if "plan" in st.session_state:
 # AI CHECKER
 # ----------------------------
 def check_answer(question, user_code):
-    prompt = f"""
-        You are a strict Python unit test checker.
-
-        RULES:
-        - Only check if the code satisfies the EXACT requirement
-        - Do NOT judge style or intent
-        - If the condition exists exactly as required → mark CORRECT
-        - If it logically satisfies requirement → mark CORRECT
-
-        QUESTION:
-        {question}
-
-        USER CODE:
-        {user_code}
-
-        OUTPUT FORMAT:
-        Either:
-        ✅ Correct
-
-        OR:
-        ❌ Incorrect
-        Explanation:
-        Fix:
-        """
-
-    return generate_answer(prompt, "")
+    return generate_answer(CHECK_ANSWER_PROMPT(question, user_code), "")
 
 
 # ----------------------------
@@ -401,10 +372,6 @@ def check_answer(question, user_code):
 @st.dialog("Result")
 def show_popup(text):
     st.markdown(text)
-
-
-import base64
-import streamlit.components.v1 as components
 
 
 def play_sound(file_path):
