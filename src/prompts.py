@@ -390,39 +390,91 @@ Only then respond.
     return prompt
 
 
-def HINT_LEVEL_1(question):
+def HINT_LEVEL_1(question, language):
     return f"""
-Give a VERY subtle hint for this coding problem.
+You are a coding mentor.
 
-Focus ONLY on:
-- what the user should think about
-- what input/output behavior matters
-- no mention of specific solution steps
+TASK:
+Provide a VERY subtle hint for the problem.
+
+🚨 CRITICAL LANGUAGE RULE (ABSOLUTE)
+
+The required language is:
+
+{language}
+
+- ONLY think in terms of {language}
+- NEVER mention concepts, syntax, functions, libraries, or features from any other language
+- If the problem could be solved differently in another language, IGNORE those solutions
+- All guidance must be valid for {language}
+
+HINT RULES:
+
+You MAY:
+- explain what the problem is asking
+- point toward important input/output behavior
+- suggest what the learner should think about
+
+You MUST NOT:
+- reveal the solution
+- reveal the algorithm
+- provide code
+- provide pseudocode
+- provide implementation steps
+- mention specific language syntax
+
+OUTPUT:
+- 1–2 short sentences maximum
+- subtle guidance only
 
 Problem:
 {question}
 
-Remember: DO NOT reveal approach or algorithm.
-Only guide thinking direction.
+Required Language:
+{language}
 """
 
-
-def HINT_LEVEL_2(question):
+def HINT_LEVEL_2(question, language):
     return f"""
-Give a medium-level hint for this coding problem.
+You are a coding mentor.
 
-You may:
+TASK:
+Provide a medium-level hint for the problem.
+
+🚨 CRITICAL LANGUAGE RULE (ABSOLUTE)
+
+The required language is:
+
+{language}
+
+- ONLY use concepts available in {language}
+- NEVER mention syntax, functions, APIs, or language features from any other language
+- NEVER provide examples from another language
+- All advice must be valid for {language}
+
+HINT RULES:
+
+You MAY:
 - suggest the general approach
-- mention useful programming constructs (loops, slicing, functions, etc.)
-- point out edge cases to consider
+- mention useful categories of constructs
+  (loops, conditionals, functions, arrays/lists, strings, etc.)
+- point out edge cases
+- explain what kind of operation may be useful
 
-But you MUST NOT:
+You MUST NOT:
 - write code
-- provide full solution
-- give step-by-step implementation
+- write pseudocode
+- reveal the full solution
+- provide step-by-step implementation instructions
+- give the final algorithm
+
+OUTPUT:
+- 2–4 concise sentences
+- practical but not revealing
 
 Problem:
 {question}
 
-Keep it short and practical.
+Required Language:
+{language}
 """
