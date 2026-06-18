@@ -65,6 +65,29 @@ Python is the core engine of SkillForge:
 
 ---
 
+## 🧩 Challenges Faced, Solutions & Learnings
+
+During the development of this project, one of the main challenges was connecting the backend logic with the Streamlit frontend. Since this was my first time building a full application using Streamlit, it initially took some time to understand how Streamlit’s execution model and `session_state` work together to manage dynamic UI updates and persistent data.
+
+Another difficulty was adapting certain features to fit within Streamlit’s limitations, especially around real-time updates, state persistence, and interactive components. Instead of forcing traditional frontend patterns, I had to rethink and redesign parts of the application to align with Streamlit’s reactive nature.
+
+### 🛠️ How I solved it
+
+I solved these issues by designing the application architecture around Streamlit’s constraints rather than against them. This included:
+
+* Relying heavily on `st.session_state` for persistent data flow
+* Structuring UI updates to work with Streamlit’s rerun behavior
+* Breaking features into modular logic that fits Streamlit’s execution cycle
+* Iteratively testing and adjusting interactions to behave as expected in a reactive environment
+
+### 📚 What I learned
+
+This project helped me gain strong practical experience with Streamlit and reactive Python-based UI development. I learned how to quickly build and ship full-stack prototypes using only Python, and how to design applications that work naturally within Streamlit’s architecture.
+
+Most importantly, I discovered how powerful Streamlit can be for rapidly turning backend logic into a functional and interactive frontend, which will significantly speed up my future projects and prototyping workflows.
+
+---
+
 ## 🖼️ Screenshots
 
 ![Main Page](/Screenshots/Screenshot1.png)
