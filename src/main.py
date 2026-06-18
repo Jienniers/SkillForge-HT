@@ -202,7 +202,6 @@ def generate_practice_questions(plan, max_retries=5):
     expected_days = {f"day_{i}" for i in range(1, 31)}
 
     for attempt in range(max_retries):
-
         try:
 
             raw = generate_answer(
