@@ -130,6 +130,40 @@ Most importantly, I discovered how powerful Streamlit can be for rapidly turning
 
 ---
 
+### 🏆 XP Rewards
+
+| Action | XP |
+|----------|----------:|
+| Correctly solve a coding question | +10 XP |
+| Complete Day 1 (First Day Achievement) | +10 XP Bonus |
+| Complete Day 30 (Final Day Achievement) | +50 XP Bonus |
+
+### 💡 XP Costs
+
+| Action | XP Cost |
+|----------|----------:|
+| Use Hint 2 (Advanced Hint) | -5 XP |
+
+### 📈 Level Progression
+
+| Level | XP Required |
+|---------|---------:|
+| 🌱 Beginner | 0 - 99 XP |
+| ⚡ Apprentice | 100 - 299 XP |
+| 🔥 Intermediate | 300 - 599 XP |
+| 🚀 Advanced | 600 - 999 XP |
+| 👑 SkillForge Master | 1000+ XP |
+
+### 🎯 Progress Tracking
+
+Users earn XP by solving coding challenges and completing roadmap milestones. Progress is tracked throughout the learning journey and reflected in the sidebar dashboard, which displays:
+
+- Current XP
+- Current Level
+- Days Completed
+- Overall Roadmap Progress
+
+---
 ## 📁 File Structure
 
 This project is currently implemented as a **single-file Streamlit application** for simplicity and rapid development. As the project evolves, the codebase is intended to be modularized into multiple files and packages to improve maintainability, scalability, and separation of concerns.
