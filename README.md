@@ -36,16 +36,19 @@ SkillForge transforms a static learning roadmap into an interactive coding exper
 Python is the core engine of SkillForge:
 
 ### 🔹 Backend Logic
+
 - Handles roadmap generation and transformation
 - Parses and validates AI-generated JSON responses
 - Manages user progress and scoring logic
 
 ### 🔹 Streamlit UI
+
 - Builds interactive web interface
 - Uses buttons, selectboxes, expanders, and layout columns
 - Displays real-time feedback and progress updates
 
 ### 🔹 Session State Management
+
 - `st.session_state` is used to persist:
   - XP system
   - Completed days
@@ -54,6 +57,7 @@ Python is the core engine of SkillForge:
   - Achievements and hints
 
 ### 🔹 AI Integration (Local LLM)
+
 - Uses `OpenAI` Python SDK
 - Connected to a **local model server (LM Studio / OpenAI-compatible API)**
 - Model used: `qwen2.5-coder-7b-instruct`
@@ -75,10 +79,10 @@ Another difficulty was adapting certain features to fit within Streamlit’s lim
 
 I solved these issues by designing the application architecture around Streamlit’s constraints rather than against them. This included:
 
-* Relying heavily on `st.session_state` for persistent data flow
-* Structuring UI updates to work with Streamlit’s rerun behavior
-* Breaking features into modular logic that fits Streamlit’s execution cycle
-* Iteratively testing and adjusting interactions to behave as expected in a reactive environment
+- Relying heavily on `st.session_state` for persistent data flow
+- Structuring UI updates to work with Streamlit’s rerun behavior
+- Breaking features into modular logic that fits Streamlit’s execution cycle
+- Iteratively testing and adjusting interactions to behave as expected in a reactive environment
 
 ### 📚 What I learned
 
@@ -88,71 +92,95 @@ Most importantly, I discovered how powerful Streamlit can be for rapidly turning
 
 ---
 
+### 🤖 Prompt Engineering & LLM Reliability
+
+This project relies on a locally hosted LLM (Qwen2.5 Coder Instruct via LM Studio) for generating structured learning plans, practice questions, and hints.
+
+To ensure consistent and reliable outputs, significant prompt engineering was required. The model was guided using strict system prompts that enforce:
+
+- Structured JSON outputs for roadmap and practice generation
+- Strict language consistency based on selected programming language
+- Controlled difficulty progression (beginner → advanced)
+- Anti-hallucination constraints to prevent introduction of external topics
+- Validation-friendly response formats for downstream parsing in Python
+
+Additionally, fallback parsing and retry mechanisms were implemented to handle occasional malformed outputs and ensure robustness in production usage.
+
+This approach allowed the LLM to behave like a structured curriculum engine rather than a free-form text generator.
+
+---
+
 ## 🖼️ Screenshots
 
 ![Main Page](/Screenshots/Screenshot1.png)
 ![Correct Answer Page](/Screenshots/Screenshot2.png)
 ![Day Completed Page](/Screenshots/Screenshot3.png)
 
-
-
 ---
 
 ## ⚙️ Key Features
 
 ### 🎯 AI-Generated Learning Roadmap
+
 - Generates a structured 30-day coding plan per language
 
 ### 💻 Interactive Coding Environment
+
 - Built-in code editor using `streamlit-ace`
 
 ### 🤖 AI Code Evaluation
+
 - Checks correctness of user solutions using local LLM
 
 ### 🧠 Practice Question Generator
+
 - Generates structured coding exercises per day/topic
 
 ### 💡 Hint System
+
 - Multi-level AI hints
 - XP penalty system for advanced hints
 
 ### 🏆 Gamification System
+
 - XP points for correct answers
 - Day completion tracking
 - Achievement triggers (first day, final day, etc.)
 
 ### 📊 Progress Tracking
+
 - Tracks completed days
 - Displays XP level progression
 
 ### 📄 PDF Export
+
 - Generates downloadable roadmap PDF using ReportLab
 
 ---
 
 ### 🏆 XP Rewards
 
-| Action | XP |
-|----------|----------:|
-| Correctly solve a coding question | +10 XP |
-| Complete Day 1 (First Day Achievement) | +10 XP Bonus |
+| Action                                  |           XP |
+| --------------------------------------- | -----------: |
+| Correctly solve a coding question       |       +10 XP |
+| Complete Day 1 (First Day Achievement)  | +10 XP Bonus |
 | Complete Day 30 (Final Day Achievement) | +50 XP Bonus |
 
 ### 💡 XP Costs
 
-| Action | XP Cost |
-|----------|----------:|
-| Use Hint 2 (Advanced Hint) | -5 XP |
+| Action                     | XP Cost |
+| -------------------------- | ------: |
+| Use Hint 2 (Advanced Hint) |   -5 XP |
 
 ### 📈 Level Progression
 
-| Level | XP Required |
-|---------|---------:|
-| 🌱 Beginner | 0 - 99 XP |
-| ⚡ Apprentice | 100 - 299 XP |
-| 🔥 Intermediate | 300 - 599 XP |
-| 🚀 Advanced | 600 - 999 XP |
-| 👑 SkillForge Master | 1000+ XP |
+| Level                |  XP Required |
+| -------------------- | -----------: |
+| 🌱 Beginner          |    0 - 99 XP |
+| ⚡ Apprentice        | 100 - 299 XP |
+| 🔥 Intermediate      | 300 - 599 XP |
+| 🚀 Advanced          | 600 - 999 XP |
+| 👑 SkillForge Master |     1000+ XP |
 
 ### 🎯 Progress Tracking
 
@@ -164,6 +192,7 @@ Users earn XP by solving coding challenges and completing roadmap milestones. Pr
 - Overall Roadmap Progress
 
 ---
+
 ## 📁 File Structure
 
 This project is currently implemented as a **single-file Streamlit application** for simplicity and rapid development. As the project evolves, the codebase is intended to be modularized into multiple files and packages to improve maintainability, scalability, and separation of concerns.
@@ -181,6 +210,7 @@ Main logical sections inside the file:
 - 🔹 Hint system
 
 Supporting file:
+
 - `./data/roadmap.json` → contains learning roadmap templates
 
 ---
@@ -188,21 +218,23 @@ Supporting file:
 ## ▶️ How to Run
 
 ### 1. Install dependencies
+
 ```bash
 pip install streamlit openai streamlit-ace reportlab
-````
+```
+
 or
 
 ```bash
 pip install -r requirements.txt
-````
+```
 
 ### 2. Run local LLM
 
 Make sure LM Studio or any OpenAI-compatible server is running:
 
-* Model: `qwen2.5-coder-7b-instruct`
-* Base URL: `http://localhost:1234/v1`
+- Model: `qwen2.5-coder-7b-instruct`
+- Base URL: `http://localhost:1234/v1`
 
 ### 3. Start Streamlit app
 
@@ -214,20 +246,20 @@ streamlit run src/main.py
 
 ## ⚠️ Important Notes
 
-* This project depends on a **local LLM (not cloud OpenAI API)**
-* All AI responses are generated locally via OpenAI-compatible endpoint
-* Session state is heavily used for persistence
-* All progress is stored only during runtime (no database yet)
-* Accuracy depends on local model response quality
+- This project depends on a **local LLM (not cloud OpenAI API)**
+- All AI responses are generated locally via OpenAI-compatible endpoint
+- Session state is heavily used for persistence
+- All progress is stored only during runtime (no database yet)
+- Accuracy depends on local model response quality
 
 ---
 
 ## 🏆 Project Highlights
 
-* Fully AI-driven learning system
-* Gamified coding practice environment
-* Local-first LLM architecture
-* Real-time evaluation + feedback loop
-* 30-day structured learning system
+- Fully AI-driven learning system
+- Gamified coding practice environment
+- Local-first LLM architecture
+- Real-time evaluation + feedback loop
+- 30-day structured learning system
 
 ---
