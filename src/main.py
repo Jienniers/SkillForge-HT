@@ -403,6 +403,26 @@ def show_popup(text):
     st.markdown(text)
 
 
+import base64
+import streamlit.components.v1 as components
+
+
+def play_sound(file_path):
+    with open(file_path, "rb") as f:
+        audio_bytes = f.read()
+
+    audio_base64 = base64.b64encode(audio_bytes).decode()
+
+    components.html(
+        f"""
+        <audio autoplay>
+            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+        </audio>
+        """,
+        height=0,
+    )
+
+
 def check_achievements(selected_day):
     selected_day = selected_day.replace("day_", "").lower()
     selected_day = int(selected_day)
@@ -421,6 +441,7 @@ def check_achievements(selected_day):
         st.session_state["xp"] += 10
         st.toast("🏆 First Day Completed! +10 XP Bonus", icon="🎉")
         st.balloons()
+        play_sound("./Sounds/AchievementSound.mp3")
 
         bonus_given.add(selected_day)
 
