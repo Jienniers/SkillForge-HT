@@ -1,0 +1,8 @@
+base64
+json
+re
+io
+streamlit
+streamlit-ace
+openai
+reportlab
