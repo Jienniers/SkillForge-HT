@@ -197,17 +197,44 @@ def clean_prac_json(raw: str):
     return raw.strip()
 
 
-def generate_practice_questions(plan, max_retries=3):
+def generate_practice_questions(plan, max_retries=5):
+
+    expected_days = {f"day_{i}" for i in range(1, 31)}
+
     for attempt in range(max_retries):
 
-        raw = generate_answer(
-            json.dumps(plan),
-            PRACTICE_SYSTEM_PROMPT,
-        )
-
         try:
+
+            raw = generate_answer(
+                json.dumps(plan),
+                PRACTICE_SYSTEM_PROMPT,
+            )
+
             cleaned = clean_prac_json(raw)
             data = json.loads(cleaned)
+
+            # ------------------------
+            # Validate day count
+            # ------------------------
+            if len(data) != 30:
+                print(f"[Attempt {attempt + 1}] Invalid day count: {len(data)}")
+                continue
+
+            generated_days = set(data.keys())
+
+            # ------------------------
+            # Ensure ALL days exist
+            # ------------------------
+            if generated_days != expected_days:
+
+                missing = expected_days - generated_days
+                extra = generated_days - expected_days
+
+                print(f"[Attempt {attempt + 1}] Missing days: {sorted(missing)}")
+
+                print(f"[Attempt {attempt + 1}] Extra days: {sorted(extra)}")
+
+                continue
 
             # ------------------------
             # Validate structure
@@ -216,14 +243,12 @@ def generate_practice_questions(plan, max_retries=3):
 
             for day, day_content in data.items():
 
-                # Every day must be a dict
                 if not isinstance(day_content, dict):
                     valid = False
                     break
 
                 for topic, questions in day_content.items():
 
-                    # Every topic must have exactly 3 questions
                     if not isinstance(questions, list) or len(questions) != 3:
                         valid = False
                         break
@@ -234,11 +259,12 @@ def generate_practice_questions(plan, max_retries=3):
             if valid:
                 return data
 
-        except Exception:
-            pass
+        except Exception as e:
+
+            print(f"[Attempt {attempt + 1}] Generation failed:" f" {str(e)}")
 
     raise ValueError(
-        "Failed to generate valid practice questions after multiple attempts."
+        "Failed to generate a valid 30-day practice plan after multiple retries."
     )
 
 
@@ -588,7 +614,8 @@ if PracticeQuestions:
                         ):
 
                             hint = generate_answer(
-                                HINT_LEVEL_1(question), HINT_SYSTEM_PROMPT
+                                HINT_LEVEL_1(question, st.session_state["language"]),
+                                HINT_SYSTEM_PROMPT,
                             )
                             st.session_state[f"hint_{key}_1"] = hint
 
@@ -601,7 +628,10 @@ if PracticeQuestions:
                                 st.error("You don't have enough XP to use this hint!")
                             else:
                                 hint = generate_answer(
-                                    HINT_LEVEL_2(question), HINT_SYSTEM_PROMPT
+                                    HINT_LEVEL_2(
+                                        question, st.session_state["language"]
+                                    ),
+                                    HINT_SYSTEM_PROMPT,
                                 )
                                 st.session_state[f"hint_{key}_2"] = hint
                                 st.session_state["xp"] -= 5
