@@ -157,6 +157,11 @@ Supporting file:
 ```bash
 pip install streamlit openai streamlit-ace reportlab
 ````
+or
+
+```bash
+pip install -r requirements.txt
+````
 
 ### 2. Run local LLM
 
