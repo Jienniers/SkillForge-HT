@@ -263,3 +263,13 @@ streamlit run src/main.py
 - 30-day structured learning system
 
 ---
+
+## 👤 Author
+
+Built and maintained by [@Jienniers](https://github.com/Jienniers)
+
+---
+
+Stay tuned for updates and releases of **SkillForge**!
+
+Feel free to ⭐ the repository if you find it useful!
