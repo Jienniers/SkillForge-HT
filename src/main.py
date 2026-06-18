@@ -445,9 +445,7 @@ def check_achievements(selected_day):
 
         bonus_given.add(selected_day)
 
-    # LAST DAY
-    if selected_day == 30 and selected_day not in bonus_given:
-
+    elif selected_day == 30 and selected_day not in bonus_given:
         if completed_days < 29:
             st.toast("⛔ Complete previous 29 days first!", icon="⚠️")
             return
@@ -457,6 +455,9 @@ def check_achievements(selected_day):
         st.balloons()
 
         bonus_given.add(selected_day)
+    else:
+        # Play a sound on each day completion
+        play_sound("./Sounds/DayCompleteSound.mp3")
 
 
 PracticeQuestions = st.session_state.get("practice_questions", None)
