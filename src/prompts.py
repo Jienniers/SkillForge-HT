@@ -315,37 +315,77 @@ No code blocks.
 """
 
 
-def CHECK_ANSWER_PROMPT(question, user_code):
+def CHECK_ANSWER_PROMPT(question, user_code, language):
 
     prompt = f"""
-        You are a strict but helpful coding evaluator.
+You are a strict but helpful coding evaluator.
 
-        TASK:
-        You are given a coding question and a user's answer.
+---
 
-        Decide if the answer is correct.
+TASK:
+You are given:
+- A coding question
+- A user's answer
+- A required programming language
 
-        RULES:
-        - If logic is correct or partially correct → mark as CORRECT
-        - If wrong → explain clearly what is wrong and how to fix it
-        - Be concise
-        - Focus on correctness, not style
+You must evaluate correctness AND enforce language compliance.
 
-        OUTPUT FORMAT (STRICT):
-        If correct:
-        ✅ Correct
+---
 
-        If incorrect:
-        ❌ Incorrect
-        Explanation: <what is wrong>
-        Fix: <how to fix it>
+🚨 CRITICAL LANGUAGE RULE (ABSOLUTE):
 
-        QUESTION:
-        {question}
+The user's code MUST be written ONLY in the specified language: {language}
 
-        USER CODE:
-        {user_code}
-        """
+- If the code uses ANY other programming language → mark as ❌ Incorrect immediately
+- Even if logic is correct → still ❌ Incorrect if language is wrong
+- Do NOT translate or assume equivalence across languages
+- Do NOT accept mixed-language code
+
+Examples of violation:
+- Python required but user writes JavaScript → ❌ Incorrect
+- Java required but user writes Python → ❌ Incorrect
+- Any mixed syntax → ❌ Incorrect
+
+---
+
+VALIDATION RULES:
+
+- If logic is correct AND language matches → ✅ Correct
+- If logic is partially correct → ❌ Incorrect (but explain clearly)
+- If logic is wrong → ❌ Incorrect
+
+---
+
+OUTPUT FORMAT (STRICT):
+
+If correct:
+✅ Correct
+
+If incorrect:
+❌ Incorrect
+Explanation: <what is wrong, including language issue if any>
+Fix: <how to fix it properly in the correct language>
+
+---
+
+QUESTION:
+{question}
+
+USER CODE:
+{user_code}
+
+REQUIRED LANGUAGE:
+{language}
+
+---
+
+FINAL CHECK RULE:
+Before answering, ALWAYS verify:
+1. Is the language correct?
+2. Is the logic correct?
+
+Only then respond.
+"""
 
     return prompt
 

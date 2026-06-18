@@ -336,17 +336,21 @@ if "plan" in st.session_state:
     with btn_col1:
         if st.button("🧠 Generate Practice Questions"):
 
-            raw = generate_answer(
-                json.dumps(st.session_state["plan"]), PRACTICE_SYSTEM_PROMPT
-            )
+            try:
+                practice_questions = generate_practice_questions(
+                    st.session_state["plan"],
+                    max_retries=5,  # optional
+                )
 
-            cleaned = clean_prac_json(raw)
-            practice_questions = json.loads(cleaned)
+                print("\n===== GENERATED PRACTICE QUESTIONS =====")
+                print(json.dumps(practice_questions, indent=4))
 
-            print("\n===== GENERATED PRACTICE QUESTIONS =====")
-            print(json.dumps(practice_questions, indent=4))
+                st.session_state["practice_questions"] = practice_questions
 
-            st.session_state["practice_questions"] = practice_questions
+                st.success("✅ Practice questions generated successfully!")
+
+            except Exception as e:
+                st.error(f"Failed to generate practice questions: {e}")
 
     with btn_col2:
         pdf_buffer = generate_roadmap_pdf_bytes(st.session_state["plan"])
@@ -363,7 +367,9 @@ if "plan" in st.session_state:
 # AI CHECKER
 # ----------------------------
 def check_answer(question, user_code):
-    return generate_answer(CHECK_ANSWER_PROMPT(question, user_code), "")
+    return generate_answer(
+        CHECK_ANSWER_PROMPT(question, user_code, st.session_state["language"]), ""
+    )
 
 
 # ----------------------------
