@@ -307,7 +307,7 @@ def generate_roadmap_pdf_bytes(plan):
 # Display plan
 if "plan" in st.session_state:
 
-    st.header(f"📚 {st.session_state['language']} - 30 Day Learning Plan")
+    st.header(f"📚 {language} - 30 Day Learning Plan")
 
     plan = st.session_state["plan"]
 
@@ -346,8 +346,6 @@ if "plan" in st.session_state:
                 print(json.dumps(practice_questions, indent=4))
 
                 st.session_state["practice_questions"] = practice_questions
-
-                st.success("✅ Practice questions generated successfully!")
 
             except Exception as e:
                 st.error(f"Failed to generate practice questions: {e}")
