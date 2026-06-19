@@ -536,6 +536,7 @@ if PracticeQuestions:
 
                         st.session_state["xp"] += 10
                         st.session_state[f"xp_awarded_{result_key}"] = True
+                        st.info("✅ Question Completed!")
                     correct += 1
 
                 total += 1
