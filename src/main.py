@@ -432,12 +432,19 @@ def check_achievements(selected_day):
     print("Bonus Given:", bonus_given)
     print("Selected Day:", selected_day)
 
-    # FIRST DAY
-    if selected_day == 1 and selected_day not in bonus_given:
-        st.session_state["xp"] += 10
-        st.toast("🏆 First Day Completed! +10 XP Bonus", icon="🎉")
-        st.balloons()
-        play_sound("./Sounds/AchievementSound.mp3")
+    # FIRST COMPLETION BONUS (ANY DAY)
+    if "first_day_bonus_given" not in st.session_state:
+        st.session_state["first_day_bonus_given"] = False
+
+    if selected_day not in bonus_given:
+        if not st.session_state["first_day_bonus_given"]:
+
+            st.session_state["xp"] += 10
+            st.toast("🏆 First Day Completed! +10 XP Bonus", icon="🎉")
+            st.balloons()
+            play_sound("./Sounds/AchievementSound.mp3")
+
+            st.session_state["first_day_bonus_given"] = True
 
         bonus_given.add(selected_day)
 
