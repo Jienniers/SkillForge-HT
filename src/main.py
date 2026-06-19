@@ -536,7 +536,8 @@ if PracticeQuestions:
 
                         st.session_state["xp"] += 10
                         st.session_state[f"xp_awarded_{result_key}"] = True
-                        st.info("✅ Question Completed!")
+                        # ✅ PERSIST COMPLETION STATE
+                        st.session_state[f"completed_{result_key}"] = True
                     correct += 1
 
                 total += 1
@@ -643,6 +644,12 @@ if PracticeQuestions:
 
                 if f"hint_{key}_2" in st.session_state:
                     st.warning(st.session_state[f"hint_{key}_2"])
+
+                # ------------------------
+                # DISPLAY QUESTION STATUS
+                # ------------------------
+                if st.session_state.get(f"completed_{result_key}", False):
+                    st.success("✅ Question Completed!")
 
     # ----------------------------
     # MARK DAY COMPLETE
