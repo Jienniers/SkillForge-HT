@@ -167,7 +167,8 @@ if generate:
     st.session_state["language"] = selected_language
     roadmap = roadmapExtract(selected_language)
 
-    st.session_state["plan"] = createPlan(roadmap)
+    with st.spinner("Generating roadmap..."):
+        st.session_state["plan"] = createPlan(roadmap)
 
     # Convert to dict if AI returned JSON string
     if isinstance(st.session_state["plan"], str):
@@ -362,10 +363,11 @@ if "plan" in st.session_state:
         if st.button("🧠 Generate Practice Questions"):
 
             try:
-                practice_questions = generate_practice_questions(
-                    st.session_state["plan"],
-                    max_retries=5,  # optional
-                )
+                with st.spinner("Generating practice questions..."):
+                    practice_questions = generate_practice_questions(
+                        st.session_state["plan"],
+                        max_retries=5,  # optional
+                    )
 
                 print("\n===== GENERATED PRACTICE QUESTIONS =====")
                 print(json.dumps(practice_questions, indent=4))
