@@ -85,6 +85,9 @@ st.set_page_config(page_title="SkillForge", page_icon="🚀", layout="wide")
 st.title("🚀 SkillForge")
 st.write("Generate a personalized 30-day programming roadmap.")
 
+if "plan" not in st.session_state:
+    st.info("👈 Generate a roadmap to start your 30-day journey!")
+
 
 def get_level(xp):
     if xp < 100:
