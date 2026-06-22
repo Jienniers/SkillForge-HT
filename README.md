@@ -11,16 +11,21 @@ It generates a personalized 30-day learning roadmap, provides coding practice qu
 
 ## 🌐 Website
 
-**Live Web App:**
-[[Deployed Web App]](https://scholar-pac-grande-wealth.trycloudflare.com)
-
 ### ⚠️ Note
 
-SkillForge uses Large Language Models (LLMs) to generate personalized learning roadmaps, practice questions, hints, and code evaluation feedback.
+SkillForge uses Large Language Models (LLMs) to dynamically generate personalized learning roadmaps, practice questions, hints, and code evaluation feedback.
 
-Because content is generated dynamically, some actions (such as roadmap generation and practice question generation) may take a few seconds to complete. This is expected behavior while the AI processes your request.
+Because the content is generated in real time, some actions (such as roadmap generation and practice question generation) may take a few seconds to complete. This is expected behavior while the AI processes your request.
 
 Please be patient during generation and avoid repeatedly clicking buttons while content is being created.
+
+### 🔗 Demo Access
+
+If a live demo of the web app is available, the access link will be provided in the **GitHub repository “About” section (top-right side of the repository page)**.
+
+If no link is shown in the About section, it means the live version is currently not deployed or temporarily unavailable.
+
+The full source code and setup instructions are still available in this repository for local execution.
 
 ---
 
