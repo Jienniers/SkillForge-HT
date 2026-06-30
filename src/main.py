@@ -44,7 +44,7 @@ load_dotenv()
 #     return response.choices[0].message.content
 
 
-client = genai.Client(api_key=os.getenv("API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def generate_answer(prompt, promptStructure):
