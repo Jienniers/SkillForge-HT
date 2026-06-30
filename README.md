@@ -4,8 +4,7 @@
 
 ## 📌 Short Description
 
-SkillForge is an interactive AI-powered coding practice platform built with Streamlit.  
-It generates a personalized 30-day learning roadmap, provides coding practice questions, and evaluates user answers using a local LLM (Qwen 2.5 Coder via OpenAI-compatible API).
+SkillForge is an interactive AI-powered coding practice platform built with Streamlit. It generates a personalized 30-day learning roadmap, provides coding practice questions, and evaluates user answers using Google Gemini 2.5 Flash.
 
 ---
 
@@ -76,11 +75,10 @@ Python is the core engine of SkillForge:
   - Generated roadmap
   - Achievements and hints
 
-### 🔹 AI Integration (Local LLM)
+### 🔹 AI Integration
 
-- Uses `OpenAI` Python SDK
-- Connected to a **local model server (LM Studio / OpenAI-compatible API)**
-- Model used: `qwen2.5-coder-7b-instruct`
+- Uses the **Google Gemini API**
+- Model used: **Gemini 2.5 Flash**
 - Responsible for:
   - Roadmap generation
   - Code evaluation
@@ -114,7 +112,7 @@ Most importantly, I discovered how powerful Streamlit can be for rapidly turning
 
 ### 🤖 Prompt Engineering & LLM Reliability
 
-This project relies on a locally hosted LLM (Qwen2.5 Coder Instruct via LM Studio) for generating structured learning plans, practice questions, and hints.
+This project relies on **Google Gemini 2.5 Flash** for generating structured learning plans, practice questions, code evaluation, and hints.
 
 To ensure consistent and reliable outputs, significant prompt engineering was required. The model was guided using strict system prompts that enforce:
 
@@ -150,7 +148,7 @@ This approach allowed the LLM to behave like a structured curriculum engine rath
 
 ### 🤖 AI Code Evaluation
 
-- Checks correctness of user solutions using local LLM
+- Checks correctness of user solutions using Gemini 2.5 Flash
 
 ### 🧠 Practice Question Generator
 
@@ -237,26 +235,28 @@ Supporting file:
 
 ## ▶️ How to Run
 
-### 1. Install dependencies
+### Option 1 — Run Locally
+
+#### 1. Clone the repository
 
 ```bash
-pip install streamlit openai streamlit-ace reportlab
+git clone https://github.com/<your-username>/SkillForge.git
+cd SkillForge
 ```
 
-or
+#### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run local LLM
+#### 3. Create a `.env` file
 
-Make sure LM Studio or any OpenAI-compatible server is running:
+```env
+GEMINI_API_KEY=your_api_key_here
+```
 
-- Model: `qwen2.5-coder-7b-instruct`
-- Base URL: `http://localhost:1234/v1`
-
-### 3. Start Streamlit app
+#### 4. Start the Streamlit app
 
 ```bash
 streamlit run src/main.py
@@ -264,13 +264,34 @@ streamlit run src/main.py
 
 ---
 
+### Option 2 — Run with Docker (Recommended)
+
+#### 1. Create a `.env` file
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+#### 2. Build and start the application
+
+```bash
+docker compose up --build
+```
+
+The application will be available at:
+
+```
+http://localhost:8501
+```
+
+---
+
 ## ⚠️ Important Notes
 
-- This project depends on a **local LLM (not cloud OpenAI API)**
-- All AI responses are generated locally via OpenAI-compatible endpoint
+- This project uses the **Google Gemini API (Gemini 2.5 Flash)** for AI-powered features.
+- A valid `GEMINI_API_KEY` is required to run the application.
 - Session state is heavily used for persistence
 - All progress is stored only during runtime (no database yet)
-- Accuracy depends on local model response quality
 
 ---
 
@@ -278,7 +299,7 @@ streamlit run src/main.py
 
 - Fully AI-driven learning system
 - Gamified coding practice environment
-- Local-first LLM architecture
+- Powered by Google Gemini 2.5 Flash
 - Real-time evaluation + feedback loop
 - 30-day structured learning system
 
