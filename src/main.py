@@ -11,6 +11,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 from streamlit_ace import st_ace
+from google import genai
+import os
+from dotenv import load_dotenv
 
 from prompts import (
     CHECK_ANSWER_PROMPT,
@@ -22,23 +25,38 @@ from prompts import (
 )
 
 jsonRoadmapFile = "./data/roadmap.json"
+load_dotenv()
+
+# def generate_answer(prompt, promptStructure):
+#     client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+
+#     response = client.chat.completions.create(
+#         model="qwen2.5-coder-7b-instruct",
+#         messages=[
+#             {"role": "system", "content": promptStructure},
+#             {
+#                 "role": "user",
+#                 "content": prompt,
+#             },
+#         ],
+#     )
+
+#     return response.choices[0].message.content
+
+
+client = genai.Client(api_key=os.getenv("API_KEY"))
 
 
 def generate_answer(prompt, promptStructure):
-    client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
-
-    response = client.chat.completions.create(
-        model="qwen2.5-coder-7b-instruct",
-        messages=[
-            {"role": "system", "content": promptStructure},
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+        config={
+            "system_instruction": promptStructure,
+        },
     )
 
-    return response.choices[0].message.content
+    return response.text
 
 
 def roadmapExtract(language):
