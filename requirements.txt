@@ -3,3 +3,4 @@ streamlit-ace
 openai
 reportlab
 google-genai
+dotenv
