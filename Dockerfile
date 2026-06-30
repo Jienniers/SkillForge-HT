@@ -15,4 +15,4 @@ EXPOSE 8501
 ENV STREAMLIT_SERVER_HEADLESS=true
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 
-CMD ["streamlit", "run", "app.py"]
+CMD ["streamlit", "run", "src/main.py"]
