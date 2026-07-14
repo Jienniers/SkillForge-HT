@@ -35,23 +35,20 @@ def create_practice_plan(
             response = generator.generate(json.dumps(plan), PRACTICE_SYSTEM_PROMPT)
             return validate_practice_plan(parse_json_object(response))
         except GenerationError as error:
-            LOGGER.warning("Practice-plan generation attempt %d/%d failed: %s", attempt,
-                           max_attempts, error)
+            LOGGER.warning(
+                "Practice-plan generation attempt %d/%d failed: %s", attempt, max_attempts, error
+            )
     raise GenerationError(
         "Failed to generate a valid 30-day practice plan after multiple attempts."
     )
 
 
-def evaluate_answer(
-    generator: TextGenerator, question: str, user_code: str, language: str
-) -> str:
+def evaluate_answer(generator: TextGenerator, question: str, user_code: str, language: str) -> str:
     """Return the evaluator's feedback for a learner's answer."""
     return generator.generate(CHECK_ANSWER_PROMPT(question, user_code, language))
 
 
-def generate_hint(
-    generator: TextGenerator, question: str, language: str, level: int
-) -> str:
+def generate_hint(generator: TextGenerator, question: str, language: str, level: int) -> str:
     """Return a non-solution hint at the requested level."""
     if level == 1:
         prompt = HINT_LEVEL_1(question, language)

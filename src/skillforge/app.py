@@ -45,7 +45,8 @@ def run() -> None:
     practice_plan = st.session_state.get("practice_questions")
     if practice_plan:
         render_practice_zone(
-            practice_plan, language,
+            practice_plan,
+            language,
             lambda question, code: evaluate_answer(generator, question, code, language),
             lambda question, level: generate_hint(generator, question, language, level),
         )

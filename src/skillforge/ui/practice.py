@@ -16,14 +16,18 @@ from skillforge.ui.shared import display_day_name, play_sound, show_result_dialo
 from skillforge.ui.state import completed_day_count, question_key, result_key, update_day_progress
 
 
-def render_practice_zone(practice_plan: PracticePlan, language: str,
-                         evaluate: Callable[[str, str], str],
-                         request_hint: Callable[[str, int], str]) -> None:
+def render_practice_zone(
+    practice_plan: PracticePlan,
+    language: str,
+    evaluate: Callable[[str, str], str],
+    request_hint: Callable[[str, int], str],
+) -> None:
     """Render the coding exercises and delegate AI work to supplied callables."""
     st.divider()
     st.header(f"🧠 Practice Zone ({language})")
-    selected_day = st.selectbox("📅 Select a Day", list(practice_plan),
-                                format_func=_format_day_option, key="selected_day")
+    selected_day = st.selectbox(
+        "📅 Select a Day", list(practice_plan), format_func=_format_day_option, key="selected_day"
+    )
     day_data = practice_plan[selected_day]
     if not day_data:
         st.info("No coding practice for this day (setup/theory day).")
@@ -32,8 +36,9 @@ def render_practice_zone(practice_plan: PracticePlan, language: str,
     for topic, questions in day_data.items():
         with st.expander(f"📌 {topic}"):
             for index, question in enumerate(questions):
-                _render_question(selected_day, topic, index, question, language, day_data,
-                                 evaluate, request_hint)
+                _render_question(
+                    selected_day, topic, index, question, language, day_data, evaluate, request_hint
+                )
     correct, total = update_day_progress(st.session_state, selected_day, day_data)
     if total and correct == total:
         _complete_day(selected_day)
@@ -45,15 +50,28 @@ def _format_day_option(day: str) -> str:
     return f"{label} (✅ Passed)" if st.session_state.get(f"done_{day}") else label
 
 
-def _render_question(day: str, topic: str, index: int, question: str, language: str,
-                     day_data: PracticeDay, evaluate: Callable[[str, str], str],
-                     request_hint: Callable[[str, int], str]) -> None:
+def _render_question(
+    day: str,
+    topic: str,
+    index: int,
+    question: str,
+    language: str,
+    day_data: PracticeDay,
+    evaluate: Callable[[str, str], str],
+    request_hint: Callable[[str, int], str],
+) -> None:
     st.markdown(f"### ❓ Question {index + 1}")
     st.write(question)
     key = question_key(day, topic, index)
     feedback_key = result_key(day, topic, index)
-    answer = st_ace(value=st.session_state.get(key, ""), language=language, theme="monokai",
-                    height=250, key=f"ace_{key}", auto_update=True)
+    answer = st_ace(
+        value=st.session_state.get(key, ""),
+        language=language,
+        theme="monokai",
+        height=250,
+        key=f"ace_{key}",
+        auto_update=True,
+    )
     check_column, _, hint_column = st.columns([2, 6, 2])
     with check_column:
         if st.button("🧪 Check", key=f"check_{key}"):
@@ -78,8 +96,9 @@ def _render_question(day: str, topic: str, index: int, question: str, language: 
         st.success("✅ Question Completed!")
 
 
-def _request_advanced_hint(key: str, question: str,
-                           request_hint: Callable[[str, int], str]) -> None:
+def _request_advanced_hint(
+    key: str, question: str, request_hint: Callable[[str, int], str]
+) -> None:
     charged_key = f"hint_charged_{key}_2"
     if not st.session_state.get(charged_key) and not can_buy_advanced_hint(
         int(st.session_state.get("xp", 0))

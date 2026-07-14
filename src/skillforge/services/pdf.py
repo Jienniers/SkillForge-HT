@@ -13,15 +13,27 @@ from skillforge.models import Roadmap
 def generate_roadmap_pdf(plan: Roadmap) -> bytes:
     """Create the downloadable roadmap PDF in memory."""
     buffer = BytesIO()
-    document = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30,
-                                 topMargin=30, bottomMargin=30)
+    document = SimpleDocTemplate(
+        buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30
+    )
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle("SkillForgeTitle", parent=styles["Title"], fontSize=20,
-                                 textColor=colors.HexColor("#4B7BEC"), spaceAfter=20)
-    day_style = ParagraphStyle("SkillForgeDay", parent=styles["Heading2"], fontSize=14,
-                               textColor=colors.black, spaceAfter=10)
-    topic_style = ParagraphStyle("SkillForgeTopic", parent=styles["Normal"], fontSize=11,
-                                 spaceAfter=5)
+    title_style = ParagraphStyle(
+        "SkillForgeTitle",
+        parent=styles["Title"],
+        fontSize=20,
+        textColor=colors.HexColor("#4B7BEC"),
+        spaceAfter=20,
+    )
+    day_style = ParagraphStyle(
+        "SkillForgeDay",
+        parent=styles["Heading2"],
+        fontSize=14,
+        textColor=colors.black,
+        spaceAfter=10,
+    )
+    topic_style = ParagraphStyle(
+        "SkillForgeTopic", parent=styles["Normal"], fontSize=11, spaceAfter=5
+    )
     story = [Paragraph("🚀 SkillForge Roadmap", title_style), Spacer(1, 10)]
     for day, topics in plan.items():
         story.append(Paragraph(day.replace("_", " ").title(), day_style))

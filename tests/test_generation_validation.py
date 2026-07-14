@@ -10,7 +10,7 @@ def _days(value: object) -> dict[str, object]:
 
 
 def test_parser_accepts_fenced_json() -> None:
-    assert parse_json_object("```json\n{\"day_1\": []}\n```") == {"day_1": []}
+    assert parse_json_object('```json\n{"day_1": []}\n```') == {"day_1": []}
 
 
 def test_parser_rejects_text_without_json() -> None:

@@ -23,9 +23,7 @@ class GeminiGenerator:
 
     def __init__(self, settings: Settings) -> None:
         if not settings.gemini_api_key:
-            raise ConfigurationError(
-                "GEMINI_API_KEY is not configured. Add it to your .env file."
-            )
+            raise ConfigurationError("GEMINI_API_KEY is not configured. Add it to your .env file.")
         self._client = genai.Client(api_key=settings.gemini_api_key)
         self._model = settings.gemini_model
 

@@ -15,8 +15,10 @@ def expected_day_keys() -> set[str]:
 def validate_roadmap(payload: dict[str, Any]) -> Roadmap:
     """Validate a generated 30-day roadmap before displaying it."""
     _validate_day_keys(payload)
-    if not all(isinstance(topics, list) and all(isinstance(topic, str) for topic in topics)
-               for topics in payload.values()):
+    if not all(
+        isinstance(topics, list) and all(isinstance(topic, str) for topic in topics)
+        for topics in payload.values()
+    ):
         raise GenerationError("Each roadmap day must contain a list of text topics.")
     return payload  # type: ignore[return-value]
 
