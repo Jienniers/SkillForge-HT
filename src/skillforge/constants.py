@@ -2,7 +2,6 @@
 
 from skillforge.config import SOUNDS_DIRECTORY
 
-
 SUPPORTED_LANGUAGES = ("Python", "JavaScript", "Java", "C++", "Go")
 DAYS_IN_PLAN = 30
 QUESTIONS_PER_TOPIC = 3

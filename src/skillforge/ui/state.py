@@ -6,7 +6,6 @@ from typing import Any
 from skillforge.constants import QUESTION_XP
 from skillforge.models import PracticeDay
 
-
 RESET_PREFIXES = ("done_", "result_", "xp_awarded_", "feedback_", "hint_", "completed_")
 RESET_KEYS = (
     "practice_questions", "achievements", "bonus_given", "first_day_bonus_given",

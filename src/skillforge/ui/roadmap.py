@@ -4,8 +4,8 @@ from collections.abc import Callable
 
 import streamlit as st
 
-from skillforge.services.pdf import generate_roadmap_pdf
 from skillforge.models import PracticePlan, Roadmap
+from skillforge.services.pdf import generate_roadmap_pdf
 from skillforge.ui.shared import display_day_name
 
 

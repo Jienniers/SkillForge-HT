@@ -19,7 +19,6 @@ from skillforge.ui.roadmap import render_roadmap
 from skillforge.ui.sidebar import render_sidebar
 from skillforge.ui.state import reset_learning_session
 
-
 logging.basicConfig(level=logging.INFO)
 
 

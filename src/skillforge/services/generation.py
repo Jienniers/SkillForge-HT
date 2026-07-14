@@ -12,11 +12,10 @@ from prompts import (
     PRACTICE_SYSTEM_PROMPT,
 )
 from skillforge.exceptions import GenerationError
+from skillforge.models import PracticePlan, Roadmap
 from skillforge.services.gemini import TextGenerator
 from skillforge.services.json_parser import parse_json_object
 from skillforge.services.validation import validate_practice_plan, validate_roadmap
-from skillforge.models import PracticePlan, Roadmap
-
 
 LOGGER = logging.getLogger(__name__)
 

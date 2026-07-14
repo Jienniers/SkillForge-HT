@@ -9,7 +9,7 @@ import ast
 
 file_path = "./src/main.py"
 
-with open(file_path, "r", encoding="utf-8") as f:
+with open(file_path, encoding="utf-8") as f:
     tree = ast.parse(f.read(), filename=file_path)
 
 globals_found = []

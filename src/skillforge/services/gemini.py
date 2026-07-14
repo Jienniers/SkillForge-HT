@@ -8,7 +8,6 @@ from google import genai
 from skillforge.config import Settings
 from skillforge.exceptions import ConfigurationError, GenerationError
 
-
 LOGGER = logging.getLogger(__name__)
 
 

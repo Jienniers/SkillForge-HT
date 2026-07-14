@@ -10,8 +10,8 @@ from skillforge.constants import (
     ADVANCED_HINT_COST_XP,
     DAY_COMPLETE_SOUND_PATH,
 )
-from skillforge.services.gamification import can_buy_advanced_hint, completion_reward
 from skillforge.models import PracticeDay, PracticePlan
+from skillforge.services.gamification import can_buy_advanced_hint, completion_reward
 from skillforge.ui.shared import display_day_name, play_sound, show_result_dialog
 from skillforge.ui.state import completed_day_count, question_key, result_key, update_day_progress
 
