@@ -1,6 +1,5 @@
+google-genai
+python-dotenv
+reportlab
 streamlit
 streamlit-ace
-openai
-reportlab
-google-genai
-dotenv

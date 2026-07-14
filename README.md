@@ -163,7 +163,7 @@ This approach allowed the LLM to behave like a structured curriculum engine rath
 
 - XP points for correct answers
 - Day completion tracking
-- Achievement triggers (first day, final day, etc.)
+- Achievement triggers (first completion and final day)
 
 ### 📊 Progress Tracking
 
@@ -178,17 +178,17 @@ This approach allowed the LLM to behave like a structured curriculum engine rath
 
 ### 🏆 XP Rewards
 
-| Action                                  |           XP |
-| --------------------------------------- | -----------: |
-| Correctly solve a coding question       |       +10 XP |
-| Complete Day 1 (First Day Achievement)  | +10 XP Bonus |
-| Complete Day 30 (Final Day Achievement) | +50 XP Bonus |
+| Action                                                       |           XP |
+| ------------------------------------------------------------ | -----------: |
+| Correctly solve a coding question                            |       +10 XP |
+| Complete the first practice day (First Completion Achievement) | +10 XP Bonus |
+| Complete Day 30 as the 30th completed day (Final Day Achievement) | +50 XP Bonus |
 
 ### 💡 XP Costs
 
-| Action                     | XP Cost |
-| -------------------------- | ------: |
-| Use Hint 2 (Advanced Hint) |   -5 XP |
+| Action                                           | XP Cost |
+| ------------------------------------------------ | ------: |
+| Use Hint 2 (Advanced Hint, once per question)    |   -5 XP |
 
 ### 📈 Level Progression
 
@@ -213,23 +213,24 @@ Users earn XP by solving coding challenges and completing roadmap milestones. Pr
 
 ## 📁 File Structure
 
-This project is currently implemented as a **single-file Streamlit application** for simplicity and rapid development. As the project evolves, the codebase is intended to be modularized into multiple files and packages to improve maintainability, scalability, and separation of concerns.
+The project is organized as a modular Streamlit application. The entry point stays intentionally small, while application logic, UI rendering, configuration, and external integrations are separated into focused modules.
 
-Main logical sections inside the file:
-
-- 🔹 AI model interface (`generate_answer`)
-- 🔹 Roadmap generation system
-- 🔹 Practice question generator
-- 🔹 Answer checking engine
-- 🔹 XP and achievement system
-- 🔹 Streamlit UI layout
-- 🔹 Session state management
-- 🔹 PDF generator
-- 🔹 Hint system
-
-Supporting file:
-
-- `./data/roadmap.json` → contains learning roadmap templates
+```text
+src/
+├── main.py                    # Streamlit entry point
+├── prompts.py                 # Gemini prompt definitions
+└── skillforge/
+    ├── app.py                 # Application composition and request flow
+    ├── config.py              # Environment settings and project paths
+    ├── constants.py           # XP rules, levels, and shared constants
+    ├── exceptions.py          # Application-specific exceptions
+    ├── models.py              # Curriculum data type aliases
+    ├── services/              # Gemini, generation, validation, PDF, and roadmap logic
+    └── ui/                    # Streamlit views and session-state helpers
+data/roadmap.json              # Learning roadmap templates
+Sounds/                        # Completion audio assets
+tests/                         # Offline unit tests
+```
 
 ---
 
@@ -243,6 +244,8 @@ Supporting file:
 git clone https://github.com/<your-username>/SkillForge.git
 cd SkillForge
 ```
+
+SkillForge requires Python 3.12 or newer.
 
 #### 2. Install dependencies
 
@@ -282,6 +285,18 @@ The application will be available at:
 
 ```
 http://localhost:8501
+```
+
+---
+
+## 🧪 Testing & Code Quality
+
+The offline unit tests do not call Gemini. Install the optional development tools, then run the checks from the project root:
+
+```bash
+pip install pytest ruff
+pytest
+ruff check .
 ```
 
 ---
