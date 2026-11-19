@@ -28,9 +28,7 @@ def generate_roadmap_for(language: str, provider: str = "local") -> Roadmap:
     return create_roadmap(_generator(provider), language)
 
 
-def generate_practice_for(
-    language: str, roadmap: Roadmap, provider: str = "local"
-) -> PracticePlan:
+def generate_practice_for(language: str, roadmap: Roadmap, provider: str = "local") -> PracticePlan:
     validate_roadmap(roadmap)
     del language  # The generated curriculum already contains its language-specific context.
     return create_practice_plan(_generator(provider), roadmap)

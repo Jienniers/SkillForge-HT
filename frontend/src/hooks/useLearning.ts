@@ -93,7 +93,12 @@ export function useLearning(language: Language, provider: AIProvider) {
     setBusy("Checking your answer…");
     setNotice("");
     try {
-      const result = await learningApi.evaluate(language, question, code, provider);
+      const result = await learningApi.evaluate(
+        language,
+        question,
+        code,
+        provider,
+      );
       const alreadyCorrect = progress.correct.includes(key);
       const newlyCorrect = result.correct && !alreadyCorrect;
       const dayComplete =

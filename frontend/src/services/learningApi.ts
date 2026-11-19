@@ -25,7 +25,12 @@ export const learningApi = {
       roadmap,
       provider,
     }),
-  evaluate: (language: string, question: string, code: string, provider: AIProvider) =>
+  evaluate: (
+    language: string,
+    question: string,
+    code: string,
+    provider: AIProvider,
+  ) =>
     post<Evaluation>("evaluate", {
       language: language.toLowerCase(),
       question,

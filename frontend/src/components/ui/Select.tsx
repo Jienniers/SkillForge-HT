@@ -56,7 +56,9 @@ export function Select({
         setIsOpen(true);
       } else {
         const offset = event.key === "ArrowDown" ? 1 : -1;
-        setActiveIndex((index) => (index + offset + options.length) % options.length);
+        setActiveIndex(
+          (index) => (index + offset + options.length) % options.length,
+        );
       }
       return;
     }
@@ -95,7 +97,9 @@ export function Select({
         aria-haspopup="listbox"
         aria-controls={listId}
         aria-expanded={isOpen}
-        aria-activedescendant={isOpen ? `${listId}-option-${activeIndex}` : undefined}
+        aria-activedescendant={
+          isOpen ? `${listId}-option-${activeIndex}` : undefined
+        }
         onClick={() => {
           setActiveIndex(selectedIndex);
           setIsOpen((open) => !open);

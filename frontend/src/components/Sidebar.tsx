@@ -8,7 +8,7 @@ export function Sidebar({
   onLanguageChange,
   onGeneratePlan,
   progress,
-  level
+  level,
 }: {
   language: Language;
   onLanguageChange: (language: Language) => void;

@@ -189,12 +189,18 @@ button {
 .app-shell[data-theme="light"] [class~="bg-amber-500/10"] {
   background-color: #fffbeb;
 }
-.app-shell[data-theme="light"] .app-sidebar [class~="bg-indigo-500"][class~="text-white"],
+.app-shell[data-theme="light"]
+  .app-sidebar
+  [class~="bg-indigo-500"][class~="text-white"],
 .app-shell[data-theme="light"] .app-sidebar button[class~="text-white"],
-.app-shell[data-theme="light"] .app-main button[class~="bg-indigo-600"][class~="text-white"] {
+.app-shell[data-theme="light"]
+  .app-main
+  button[class~="bg-indigo-600"][class~="text-white"] {
   color: #fff;
 }
-.app-shell[data-theme="light"] .app-sidebar [class~="bg-indigo-500"]:not([class~="text-white"]) {
+.app-shell[data-theme="light"]
+  .app-sidebar
+  [class~="bg-indigo-500"]:not([class~="text-white"]) {
   color: #fff;
 }
 .app-shell[data-theme="light"] .app-main .text-emerald-100 {

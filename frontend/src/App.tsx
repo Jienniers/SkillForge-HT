@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router";
 import { Sidebar } from "./components/Sidebar";
 import { Notice } from "./components/ui/Notice";
 import { BusyToast } from "./components/ui/BusyToast";
@@ -20,7 +26,10 @@ function Application() {
   const location = useLocation();
 
   return (
-    <div data-theme={theme} className="app-shell min-h-screen bg-slate-950 text-slate-100 md:flex">
+    <div
+      data-theme={theme}
+      className="app-shell min-h-screen bg-slate-950 text-slate-100 md:flex"
+    >
       <Sidebar
         language={language}
         onLanguageChange={setLanguage}
@@ -86,17 +95,17 @@ function Application() {
               }
             />
 
-          <Route
-            path="/settings"
-            element={
-              <SettingsPage
-                theme={theme}
-                onThemeChange={setTheme}
-                provider={provider}
-                onProviderChange={setProvider}
-              />
-            }
-          />
+            <Route
+              path="/settings"
+              element={
+                <SettingsPage
+                  theme={theme}
+                  onThemeChange={setTheme}
+                  provider={provider}
+                  onProviderChange={setProvider}
+                />
+              }
+            />
           </Routes>
         </div>
 
