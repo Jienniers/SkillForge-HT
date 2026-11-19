@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { learningApi } from "../services/learningApi";
+import type { AIProvider } from "../types/provider";
 import {
   emptyProgress,
   type Language,
@@ -13,7 +14,7 @@ import {
   saveProgress,
 } from "../utils/learning";
 
-export function useLearning(language: Language) {
+export function useLearning(language: Language, provider: AIProvider) {
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [practice, setPractice] = useState<PracticePlan | null>(null);
   const [selectedDay, setSelectedDay] = useState("day_1");
@@ -53,7 +54,7 @@ export function useLearning(language: Language) {
     setBusy("Generating your roadmap…");
     setNotice("");
     try {
-      setRoadmap(await learningApi.roadmap(language));
+      setRoadmap(await learningApi.roadmap(language, provider));
       setPractice(null);
       setSelectedDay("day_1");
       setProgress(emptyProgress);
@@ -72,7 +73,7 @@ export function useLearning(language: Language) {
     setBusy("Generating practice questions…");
     setNotice("");
     try {
-      setPractice(await learningApi.practice(language, roadmap));
+      setPractice(await learningApi.practice(language, roadmap, provider));
     } catch (error) {
       setNotice(
         error instanceof Error
@@ -92,7 +93,7 @@ export function useLearning(language: Language) {
     setBusy("Checking your answer…");
     setNotice("");
     try {
-      const result = await learningApi.evaluate(language, question, code);
+      const result = await learningApi.evaluate(language, question, code, provider);
       const alreadyCorrect = progress.correct.includes(key);
       const newlyCorrect = result.correct && !alreadyCorrect;
       const dayComplete =
@@ -151,6 +152,7 @@ export function useLearning(language: Language) {
         level,
         progress.xp,
         charged,
+        provider,
       );
       updateProgress((current) => ({
         ...current,

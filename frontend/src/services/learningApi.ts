@@ -1,4 +1,5 @@
 import type { Evaluation, PracticePlan, Roadmap } from "../types/learning";
+import type { AIProvider } from "../types/provider";
 
 const apiBase = import.meta.env.VITE_API_URL ?? "";
 async function post<T>(path: string, body: unknown): Promise<T> {
@@ -16,18 +17,20 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 export const learningApi = {
-  roadmap: (language: string) =>
-    post<Roadmap>("roadmap", { language: language.toLowerCase() }),
-  practice: (language: string, roadmap: Roadmap) =>
+  roadmap: (language: string, provider: AIProvider) =>
+    post<Roadmap>("roadmap", { language: language.toLowerCase(), provider }),
+  practice: (language: string, roadmap: Roadmap, provider: AIProvider) =>
     post<PracticePlan>("practice", {
       language: language.toLowerCase(),
       roadmap,
+      provider,
     }),
-  evaluate: (language: string, question: string, code: string) =>
+  evaluate: (language: string, question: string, code: string, provider: AIProvider) =>
     post<Evaluation>("evaluate", {
       language: language.toLowerCase(),
       question,
       code,
+      provider,
     }),
   hint: (
     language: string,
@@ -35,6 +38,7 @@ export const learningApi = {
     level: 1 | 2,
     xp: number,
     alreadyCharged: boolean,
+    provider: AIProvider,
   ) =>
     post<{ hint: string; xp_cost: number }>("hint", {
       language: language.toLowerCase(),
@@ -42,6 +46,7 @@ export const learningApi = {
       level,
       xp,
       already_charged: alreadyCharged,
+      provider,
     }),
   completion: (
     dayNumber: number,

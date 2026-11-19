@@ -3,3 +3,4 @@ python-dotenv
 reportlab
 fastapi
 uvicorn[standard]
+openai

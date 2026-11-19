@@ -7,10 +7,12 @@ from pydantic import BaseModel, Field
 
 class RoadmapRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
+    provider: Literal["local", "gemini"] = "local"
 
 
 class PracticeRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
+    provider: Literal["local", "gemini"] = "local"
     roadmap: dict[str, list[str]]
 
 
@@ -20,6 +22,7 @@ class RoadmapPdfRequest(BaseModel):
 
 class EvaluationRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
+    provider: Literal["local", "gemini"] = "local"
     question: str = Field(min_length=1)
     code: str = Field(min_length=1)
 
@@ -32,6 +35,7 @@ class EvaluationResponse(BaseModel):
 
 class HintRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
+    provider: Literal["local", "gemini"] = "local"
     question: str = Field(min_length=1)
     level: Literal[1, 2]
     xp: int = Field(ge=0, default=0)

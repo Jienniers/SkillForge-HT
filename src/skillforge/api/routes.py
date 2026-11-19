@@ -30,17 +30,19 @@ router = APIRouter(prefix="/api")
 
 @router.post("/roadmap")
 def roadmap(request: RoadmapRequest) -> dict[str, list[str]]:
-    return _run(generate_roadmap_for, request.language)
+    return _run(generate_roadmap_for, request.language, request.provider)
 
 
 @router.post("/practice")
 def practice(request: PracticeRequest) -> dict[str, dict[str, list[str]]]:
-    return _run(generate_practice_for, request.language, request.roadmap)
+    return _run(generate_practice_for, request.language, request.roadmap, request.provider)
 
 
 @router.post("/evaluate", response_model=EvaluationResponse)
 def evaluate_answer(request: EvaluationRequest) -> EvaluationResponse:
-    feedback, correct, xp_awarded = _run(evaluate, request.question, request.code, request.language)
+    feedback, correct, xp_awarded = _run(
+        evaluate, request.question, request.code, request.language, request.provider
+    )
     return EvaluationResponse(feedback=feedback, correct=correct, xp_awarded=xp_awarded)
 
 
@@ -53,6 +55,7 @@ def hint(request: HintRequest) -> dict[str, str | int]:
         request.level,
         request.xp,
         request.already_charged,
+        request.provider,
     )
     return {"hint": content, "xp_cost": xp_cost}
 

@@ -7,12 +7,14 @@ import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { RoadmapPage } from "./pages/RoadmapPage";
 import { useLearning } from "./hooks/useLearning";
 import { useTheme } from "./hooks/useTheme";
+import { useAIProvider } from "./hooks/useAIProvider";
 import { type Language, languages } from "./types/learning";
 import { SettingsPage } from "./pages/SettingsPage";
 
 function Application() {
   const [language, setLanguage] = useState<Language>(languages[0]);
-  const learning = useLearning(language);
+  const { provider, setProvider } = useAIProvider();
+  const learning = useLearning(language, provider);
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,7 +89,14 @@ function Application() {
 
           <Route
             path="/settings"
-            element={<SettingsPage theme={theme} onThemeChange={setTheme} />}
+            element={
+              <SettingsPage
+                theme={theme}
+                onThemeChange={setTheme}
+                provider={provider}
+                onProviderChange={setProvider}
+              />
+            }
           />
           </Routes>
         </div>
