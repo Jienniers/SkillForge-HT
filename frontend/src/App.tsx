@@ -27,7 +27,6 @@ function Application() {
         onGeneratePlan={learning.generatePlan}
         progress={learning.progress}
         level={learning.level}
-        onRefresh={learning.resetSelection}
       />
 
       <main className="app-main min-w-0 flex-1 p-5 md:p-10">

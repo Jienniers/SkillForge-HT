@@ -8,15 +8,13 @@ export function Sidebar({
   onLanguageChange,
   onGeneratePlan,
   progress,
-  level,
-  onRefresh,
+  level
 }: {
   language: Language;
   onLanguageChange: (language: Language) => void;
   onGeneratePlan: () => void;
   progress: Progress;
   level: string;
-  onRefresh: () => void;
 }) {
   return (
     <aside className="app-sidebar w-full bg-[#101a31] p-5 text-white md:min-h-screen md:w-72 md:shrink-0 md:p-6">
@@ -87,9 +85,6 @@ export function Sidebar({
             style={{ width: `${(progress.completed.length / 30) * 100}%` }}
           />
         </div>
-        <Button variant="quiet" onClick={onRefresh} className="mt-5 w-full">
-          Refresh
-        </Button>
       </section>
       <p className="mt-6 hidden text-xs leading-5 text-slate-500 md:block">
         Your answers and progress are saved locally in this browser.

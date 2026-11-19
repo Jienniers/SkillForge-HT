@@ -192,10 +192,6 @@ export function useLearning(language: Language, provider: AIProvider) {
       setBusy("");
     }
   }
-  function resetSelection() {
-    setSelectedDay("day_1");
-    setNotice("Progress is saved in this browser.");
-  }
   function updateAnswer(key: string, value: string) {
     updateProgress((current) => ({
       ...current,
@@ -218,7 +214,6 @@ export function useLearning(language: Language, provider: AIProvider) {
     checkAnswer,
     getHint,
     downloadPdf,
-    resetSelection,
     updateAnswer,
   };
 }
