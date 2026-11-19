@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router";
 import { Sidebar } from "./components/Sidebar";
 import { Notice } from "./components/ui/Notice";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
@@ -11,6 +11,7 @@ function Application() {
   const [language, setLanguage] = useState<Language>(languages[0]);
   const learning = useLearning(language);
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 md:flex">
@@ -54,38 +55,40 @@ function Application() {
           </div>
         )}
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <RoadmapPage
-                language={language}
-                roadmap={learning.roadmap}
-                practice={learning.practice}
-                selectedDay={learning.selectedDay}
-                onSelectDay={learning.setSelectedDay}
-                progress={learning.progress}
-                onGeneratePlan={learning.generatePlan}
-                onGeneratePractice={learning.generatePractice}
-                onDownloadPdf={learning.downloadPdf}
-                onAnswer={learning.updateAnswer}
-                onCheck={learning.checkAnswer}
-                onHint={learning.getHint}
-              />
-            }
-          />
+        <div key={location.pathname} className="page-transition">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <RoadmapPage
+                  language={language}
+                  roadmap={learning.roadmap}
+                  practice={learning.practice}
+                  selectedDay={learning.selectedDay}
+                  onSelectDay={learning.setSelectedDay}
+                  progress={learning.progress}
+                  onGeneratePlan={learning.generatePlan}
+                  onGeneratePractice={learning.generatePractice}
+                  onDownloadPdf={learning.downloadPdf}
+                  onAnswer={learning.updateAnswer}
+                  onCheck={learning.checkAnswer}
+                  onHint={learning.getHint}
+                />
+              }
+            />
 
-          <Route
-            path="/analytics"
-            element={
-              <AnalyticsPage
-                progress={learning.progress}
-                level={learning.level}
-                onContinue={() => navigate("/")}
-              />
-            }
-          />
-        </Routes>
+            <Route
+              path="/analytics"
+              element={
+                <AnalyticsPage
+                  progress={learning.progress}
+                  level={learning.level}
+                  onContinue={() => navigate("/")}
+                />
+              }
+            />
+          </Routes>
+        </div>
 
         <footer className="mt-8 text-center text-xs text-slate-500">
           SkillForge · Keep showing up, one day at a time.
