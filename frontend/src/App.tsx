@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router";
 import { Sidebar } from "./components/Sidebar";
 import { Notice } from "./components/ui/Notice";
+import { BusyToast } from "./components/ui/BusyToast";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { RoadmapPage } from "./pages/RoadmapPage";
 import { useLearning } from "./hooks/useLearning";
@@ -49,14 +50,7 @@ function Application() {
           </Notice>
         )}
 
-        {learning.busy && (
-          <div
-            role="status"
-            className="mb-5 rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-sm text-indigo-300"
-          >
-            {learning.busy}
-          </div>
-        )}
+        <BusyToast message={learning.busy} />
 
         <div key={location.pathname} className="page-transition">
           <Routes>
