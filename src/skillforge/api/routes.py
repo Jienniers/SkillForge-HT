@@ -6,6 +6,7 @@ from fastapi.responses import Response
 from skillforge.api.schemas import (
     CompletionRequest,
     EvaluationRequest,
+    EvaluationResponse,
     HintRequest,
     LevelRequest,
     PracticeRequest,
@@ -37,10 +38,10 @@ def practice(request: PracticeRequest) -> dict[str, dict[str, list[str]]]:
     return _run(generate_practice_for, request.language, request.roadmap)
 
 
-@router.post("/evaluate")
-def evaluate_answer(request: EvaluationRequest) -> dict[str, str | bool]:
+@router.post("/evaluate", response_model=EvaluationResponse)
+def evaluate_answer(request: EvaluationRequest) -> EvaluationResponse:
     feedback, correct, xp_awarded = _run(evaluate, request.question, request.code, request.language)
-    return {"feedback": feedback, "correct": correct, "xp_awarded": xp_awarded}
+    return EvaluationResponse(feedback=feedback, correct=correct, xp_awarded=xp_awarded)
 
 
 @router.post("/hint")

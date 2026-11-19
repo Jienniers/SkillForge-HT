@@ -24,6 +24,12 @@ class EvaluationRequest(BaseModel):
     code: str = Field(min_length=1)
 
 
+class EvaluationResponse(BaseModel):
+    feedback: str
+    correct: bool
+    xp_awarded: int
+
+
 class HintRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
     question: str = Field(min_length=1)
