@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router'
-import { Sidebar } from './components/Sidebar'
-import { Notice } from './components/ui/Notice'
-import { AnalyticsPage } from './pages/AnalyticsPage'
-import { RoadmapPage } from './pages/RoadmapPage'
-import { useLearning } from './hooks/useLearning'
-import { type Language, languages } from './types/learning'
+import { useState } from "react";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router";
+import { Sidebar } from "./components/Sidebar";
+import { Notice } from "./components/ui/Notice";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { RoadmapPage } from "./pages/RoadmapPage";
+import { useLearning } from "./hooks/useLearning";
+import { type Language, languages } from "./types/learning";
 
 function Application() {
-  const [language, setLanguage] = useState<Language>(languages[0])
-  const learning = useLearning(language)
-  const navigate = useNavigate()
+  const [language, setLanguage] = useState<Language>(languages[0]);
+  const learning = useLearning(language);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 md:flex">
@@ -40,7 +40,7 @@ function Application() {
         </header>
 
         {learning.notice && (
-          <Notice onDismiss={() => learning.setNotice('')}>
+          <Notice onDismiss={() => learning.setNotice("")}>
             {learning.notice}
           </Notice>
         )}
@@ -81,7 +81,7 @@ function Application() {
               <AnalyticsPage
                 progress={learning.progress}
                 level={learning.level}
-                onContinue={() => navigate('/')}
+                onContinue={() => navigate("/")}
               />
             }
           />
@@ -92,7 +92,7 @@ function Application() {
         </footer>
       </main>
     </div>
-  )
+  );
 }
 
 export default function App() {
@@ -100,5 +100,5 @@ export default function App() {
     <BrowserRouter>
       <Application />
     </BrowserRouter>
-  )
+  );
 }
