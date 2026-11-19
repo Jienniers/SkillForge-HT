@@ -1,5 +1,6 @@
 import { Button } from "./ui/Button";
 import { Select } from "./ui/Select";
+import { DropdownCard } from "./ui/DropdownCard";
 import type { Language, PracticePlan, Progress } from "../types/learning";
 import { dayName } from "../utils/learning";
 
@@ -66,20 +67,14 @@ export function PracticePanel({
             📘 {dayName(selectedDay)}
           </h3>
           {Object.entries(topics).map(([topic, list]) => (
-            <details
-              key={topic}
-              className="mt-4 self-start rounded-xl border border-slate-700"
-            >
-              <summary className="cursor-pointer bg-slate-800 p-4 font-semibold">
-                📌 {topic}
-              </summary>
-              <div className="space-y-6 p-4">
+            <DropdownCard key={topic} title={`📌 ${topic}`} className="mt-4">
+              <div className="space-y-6">
                 {list.map((question, index) => {
                   const key = `${selectedDay}-${topic}-${index}`;
                   return (
                     <article
                       key={key}
-                      className="border-b border-slate-100 pb-6 last:border-0"
+                      className="border-b border-slate-700 pb-6 last:border-0"
                     >
                       <h4 className="font-semibold">❓ Question {index + 1}</h4>
                       <p className="mt-2 text-sm leading-6 text-slate-300">
@@ -135,7 +130,7 @@ export function PracticePanel({
                   );
                 })}
               </div>
-            </details>
+            </DropdownCard>
           ))}
           {passed && (
             <p className="mt-5 rounded-lg bg-emerald-500/10 p-4 font-semibold text-emerald-200">
