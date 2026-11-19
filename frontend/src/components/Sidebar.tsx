@@ -19,7 +19,7 @@ export function Sidebar({
   onRefresh: () => void;
 }) {
   return (
-    <aside className="w-full bg-[#101a31] p-5 text-white md:min-h-screen md:w-72 md:shrink-0 md:p-6">
+    <aside className="app-sidebar w-full bg-[#101a31] p-5 text-white md:min-h-screen md:w-72 md:shrink-0 md:p-6">
       <NavLink
         to="/"
         className="mb-7 flex items-center gap-3 text-xl font-bold"
@@ -29,7 +29,7 @@ export function Sidebar({
         </span>{" "}
         SkillForge
       </NavLink>
-      <div className="mb-5 rounded-2xl bg-white/5 p-4">
+      <div className="sidebar-panel mb-5 rounded-2xl bg-white/5 p-4">
         <label
           htmlFor="language"
           className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400"
@@ -56,6 +56,7 @@ export function Sidebar({
         {[
           ["/", "⌂", "Roadmap"],
           ["/analytics", "▥", "Progress"],
+          ["/settings", "⚙", "Settings"],
         ].map(([to, icon, title]) => (
           <NavLink
             key={to}
@@ -69,7 +70,7 @@ export function Sidebar({
           </NavLink>
         ))}
       </nav>
-      <section className="hidden rounded-2xl border border-white/10 bg-white/5 p-4 md:block">
+      <section className="sidebar-panel hidden rounded-2xl border border-white/10 bg-white/5 p-4 md:block">
         <h2 className="mb-4 text-sm font-semibold">📊 Your stats</h2>
         <div className="flex justify-between text-sm">
           <span className="text-slate-400">Experience</span>

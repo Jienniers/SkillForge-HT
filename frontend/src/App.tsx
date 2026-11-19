@@ -5,16 +5,19 @@ import { Notice } from "./components/ui/Notice";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { RoadmapPage } from "./pages/RoadmapPage";
 import { useLearning } from "./hooks/useLearning";
+import { useTheme } from "./hooks/useTheme";
 import { type Language, languages } from "./types/learning";
+import { SettingsPage } from "./pages/SettingsPage";
 
 function Application() {
   const [language, setLanguage] = useState<Language>(languages[0]);
   const learning = useLearning(language);
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 md:flex">
+    <div data-theme={theme} className="app-shell min-h-screen bg-slate-950 text-slate-100 md:flex">
       <Sidebar
         language={language}
         onLanguageChange={setLanguage}
@@ -24,7 +27,7 @@ function Application() {
         onRefresh={learning.resetSelection}
       />
 
-      <main className="min-w-0 flex-1 p-5 md:p-10">
+      <main className="app-main min-w-0 flex-1 p-5 md:p-10">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-indigo-400">
@@ -87,6 +90,11 @@ function Application() {
                 />
               }
             />
+
+          <Route
+            path="/settings"
+            element={<SettingsPage theme={theme} onThemeChange={setTheme} />}
+          />
           </Routes>
         </div>
 
