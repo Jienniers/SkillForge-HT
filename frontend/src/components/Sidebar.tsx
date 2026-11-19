@@ -38,14 +38,12 @@ export function Sidebar({
         </label>
         <Select
           id="language"
+          ariaLabel="Your learning path"
           value={language}
-          onChange={(event) => onLanguageChange(event.target.value as Language)}
-          className="w-full border-white/10 bg-[#1b2944] text-white"
-        >
-          {languages.map((item) => (
-            <option key={item}>{item}</option>
-          ))}
-        </Select>
+          onChange={(value) => onLanguageChange(value as Language)}
+          options={languages.map((item) => ({ value: item, label: item }))}
+          className="w-full"
+        />
         <Button
           variant="primary"
           onClick={onGeneratePlan}

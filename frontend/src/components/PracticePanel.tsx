@@ -45,17 +45,16 @@ export function PracticePanel({
           <h2 className="mt-1 text-2xl font-bold">🧠 Practice zone</h2>
         </div>
         <Select
-          aria-label="Select a practice day"
+          ariaLabel="Select a practice day"
           value={selectedDay}
-          onChange={(event) => onSelectDay(event.target.value)}
-        >
-          {Object.keys(practice).map((day) => (
-            <option key={day} value={day}>
-              {dayName(day)}
-              {progress.completed.includes(day) ? " (✅ Passed)" : ""}
-            </option>
-          ))}
-        </Select>
+          onChange={onSelectDay}
+          options={Object.keys(practice).map((day) => ({
+            value: day,
+            label: `${dayName(day)}${progress.completed.includes(day) ? " (✅ Passed)" : ""}`,
+          }))}
+          placement="top"
+          className="w-full sm:w-56"
+        />
       </div>
       {questions.length === 0 ? (
         <p className="mt-6 rounded-lg bg-slate-800 p-4 text-slate-300">

@@ -54,9 +54,25 @@ button {
   opacity: 1;
   transform: translateY(0);
 }
+.select-menu {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top;
+  transition:
+    opacity 150ms ease,
+    transform 180ms ease,
+    visibility 150ms;
+}
+.select-menu[data-open="true"] {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 @media (prefers-reduced-motion: reduce) {
   .dropdown-panel,
-  .dropdown-panel-inner {
+  .dropdown-panel-inner,
+  .select-menu {
     transition: none;
   }
 }
