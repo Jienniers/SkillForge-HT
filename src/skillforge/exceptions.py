@@ -11,7 +11,3 @@ class ConfigurationError(SkillForgeError):
 
 class GenerationError(SkillForgeError):
     """Raised when an AI response cannot be used safely."""
-
-
-class InvalidRoadmapError(SkillForgeError):
-    """Raised when the local roadmap file has an unexpected shape."""

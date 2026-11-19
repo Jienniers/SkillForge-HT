@@ -4,6 +4,7 @@ import logging
 from typing import Protocol
 
 from google import genai
+from google.genai import types
 
 from skillforge.config import Settings
 from skillforge.exceptions import ConfigurationError, GenerationError
@@ -24,7 +25,10 @@ class GeminiGenerator:
     def __init__(self, settings: Settings) -> None:
         if not settings.gemini_api_key:
             raise ConfigurationError("GEMINI_API_KEY is not configured. Add it to your .env file.")
-        self._client = genai.Client(api_key=settings.gemini_api_key)
+        self._client = genai.Client(
+            api_key=settings.gemini_api_key,
+            http_options=types.HttpOptions(api_version="v1beta"),
+        )
         self._model = settings.gemini_model
 
     def generate(self, prompt: str, system_instruction: str = "") -> str:

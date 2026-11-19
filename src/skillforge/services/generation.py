@@ -20,9 +20,11 @@ from skillforge.services.validation import validate_practice_plan, validate_road
 LOGGER = logging.getLogger(__name__)
 
 
-def create_roadmap(generator: TextGenerator, source_steps: list[str]) -> Roadmap:
-    """Expand source roadmap steps into a validated 30-day curriculum."""
-    response = generator.generate(json.dumps(source_steps), PLAN)
+def create_roadmap(generator: TextGenerator, language: str) -> Roadmap:
+    """Generate and validate a 30-day curriculum for a programming language."""
+    response = generator.generate(
+        f"Create a roadmap for {language}.", PLAN.format(language=language)
+    )
     return validate_roadmap(parse_json_object(response))
 
 

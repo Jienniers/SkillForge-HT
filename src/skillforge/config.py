@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIRECTORY = PROJECT_ROOT / "data"
-SOUNDS_DIRECTORY = PROJECT_ROOT / "Sounds"
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,7 +13,6 @@ class Settings:
 
     gemini_api_key: str | None
     gemini_model: str = "gemini-2.5-flash"
-    roadmap_path: Path = DATA_DIRECTORY / "roadmap.json"
 
     @classmethod
     def from_environment(cls) -> "Settings":
