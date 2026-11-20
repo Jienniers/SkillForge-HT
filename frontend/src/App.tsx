@@ -9,6 +9,7 @@ import {
 import { Sidebar } from "./components/Sidebar";
 import { Notice } from "./components/ui/Notice";
 import { BusyToast } from "./components/ui/BusyToast";
+import { ActionToast } from "./components/ui/ActionToast";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { RoadmapPage } from "./pages/RoadmapPage";
 import { useLearning } from "./hooks/useLearning";
@@ -61,7 +62,15 @@ function Application() {
           </Notice>
         )}
 
-        <BusyToast message={learning.busy} />
+        {(learning.busy || learning.toastMessage) && (
+          <div className="fixed right-4 top-4 z-[100] flex w-[calc(100vw-2rem)] flex-col items-end gap-2 md:right-6 md:top-6 md:w-auto md:max-w-md">
+            <BusyToast message={learning.busy} />
+            <ActionToast
+              message={learning.toastMessage}
+              onDismiss={learning.dismissToast}
+            />
+          </div>
+        )}
 
         <div key={location.pathname} className="page-transition">
           <Routes>

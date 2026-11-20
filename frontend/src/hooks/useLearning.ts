@@ -23,8 +23,16 @@ export function useLearning(language: Language, provider: AIProvider) {
   const [busy, setBusy] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [notice, setNotice] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
   const generationInFlight = useRef(false);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => saveProgress(progress), [progress]);
+  useEffect(
+    () => () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    [],
+  );
   useEffect(() => {
     let current = true;
     learningApi
@@ -51,6 +59,16 @@ export function useLearning(language: Language, provider: AIProvider) {
   );
   const updateProgress = (transform: (current: Progress) => Progress) =>
     setProgress((current) => transform(current));
+  function showToast(message: string) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMessage(message);
+    toastTimer.current = setTimeout(() => setToastMessage(""), 3500);
+  }
+  function dismissToast() {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = null;
+    setToastMessage("");
+  }
 
   async function generatePlan() {
     if (generationInFlight.current) return;
@@ -159,6 +177,10 @@ export function useLearning(language: Language, provider: AIProvider) {
   }
   async function getHint(key: string, question: string, level: 1 | 2) {
     const charged = progress.charged.includes(key);
+    if (level === 2 && !charged && progress.xp < 5) {
+      showToast("You don't have enough XP to use this hint.");
+      return;
+    }
     setBusy("Getting a hint…");
     setNotice("");
     try {
@@ -180,9 +202,10 @@ export function useLearning(language: Language, provider: AIProvider) {
             : current.charged,
       }));
     } catch (error) {
-      setNotice(
-        error instanceof Error ? error.message : "Could not generate a hint.",
-      );
+      const message =
+        error instanceof Error ? error.message : "Could not generate a hint.";
+      if (message.includes("don't have enough XP")) showToast(message);
+      else setNotice(message);
     } finally {
       setBusy("");
     }
@@ -223,6 +246,8 @@ export function useLearning(language: Language, provider: AIProvider) {
     level,
     busy,
     isGenerating,
+    toastMessage,
+    dismissToast,
     notice,
     setNotice,
     currentQuestions,
