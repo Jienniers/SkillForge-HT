@@ -70,6 +70,10 @@ export function PracticePanel({
               <div className="space-y-6">
                 {list.map((question, index) => {
                   const key = `${selectedDay}-${topic}-${index}`;
+                  const isCorrect = progress.correct.includes(key);
+                  const feedback = (progress.results[key] ?? "")
+                    .replace(/^\s*(?:\*\*)?✅\s*Correct(?:\*\*)?\s*/u, "")
+                    .trim();
                   return (
                     <article
                       key={key}
@@ -113,16 +117,14 @@ export function PracticePanel({
                       )}
                       {progress.results[key] && (
                         <div
-                          className={`mt-3 rounded-lg p-4 text-sm ${progress.correct.includes(key) ? "bg-emerald-500/10 text-emerald-200" : "bg-amber-500/10 text-amber-200"}`}
+                          className={`mt-3 rounded-lg p-4 text-sm ${isCorrect ? "bg-emerald-500/10 text-emerald-200" : "bg-amber-500/10 text-amber-200"}`}
                         >
                           <b>
-                            {progress.correct.includes(key)
-                              ? "✅ Correct"
-                              : "📝 Feedback"}
+                            {isCorrect ? "✅ Correct" : "📝 Feedback"}
                           </b>
-                          <p className="mt-1 whitespace-pre-wrap">
-                            {progress.results[key]}
-                          </p>
+                          {feedback && (
+                            <p className="mt-1 whitespace-pre-wrap">{feedback}</p>
+                          )}
                         </div>
                       )}
                     </article>
