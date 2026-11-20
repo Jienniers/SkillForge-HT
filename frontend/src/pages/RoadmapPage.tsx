@@ -8,6 +8,7 @@ import type {
   Roadmap,
 } from "../types/learning";
 import { dayName } from "../utils/learning";
+import { InlineMarkdown } from "../components/ui/InlineMarkdown";
 
 export function RoadmapPage({
   language,
@@ -96,7 +97,11 @@ export function RoadmapPage({
                   >
                     {topic.toLowerCase() === "rest day"
                       ? "😴 Rest Day"
-                      : `✓ ${topic}`}
+                      : (
+                          <>
+                            ✓ <InlineMarkdown text={topic} />
+                          </>
+                        )}
                   </p>
                 ))}
               </div>
