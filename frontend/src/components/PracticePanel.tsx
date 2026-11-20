@@ -90,8 +90,8 @@ export function PracticePanel({
                       className="border-b border-slate-700 pb-6 last:border-0"
                     >
                       <h4 className="font-semibold">❓ Question {index + 1}</h4>
-                      <p className="mt-2 text-sm leading-6 text-slate-300">
-                        {question}
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-300">
+                        <InlineMarkdown text={question} />
                       </p>
                       <textarea
                         aria-label={`Answer ${index + 1}`}
