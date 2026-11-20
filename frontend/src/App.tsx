@@ -37,6 +37,8 @@ function Application() {
         onGeneratePlan={learning.generatePlan}
         isGenerating={learning.isGenerating}
         progress={learning.progress}
+        completedDays={learning.completedDays}
+        totalPracticeDays={learning.totalPracticeDays}
         level={learning.level}
       />
 
@@ -100,6 +102,8 @@ function Application() {
               element={
                 <AnalyticsPage
                   progress={learning.progress}
+                  completedDays={learning.completedDays}
+                  totalPracticeDays={learning.totalPracticeDays}
                   level={learning.level}
                   onContinue={() => navigate("/")}
                 />

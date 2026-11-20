@@ -56,11 +56,19 @@ def generate_hint_for(
     return generate_hint(_generator(provider), question, language, level), cost
 
 
-def completion_reward_for(day_number: int, completed_day_count: int, first_bonus_given: bool):
+def completion_reward_for(
+    day_number: int,
+    completed_day_count: int,
+    first_bonus_given: bool,
+    total_practice_days: int = 30,
+    final_practice_day: bool = False,
+):
     return completion_reward(
         day_number=day_number,
         completed_day_count=completed_day_count,
         first_bonus_given=first_bonus_given,
+        total_practice_days=total_practice_days,
+        final_practice_day=final_practice_day,
     )
 
 

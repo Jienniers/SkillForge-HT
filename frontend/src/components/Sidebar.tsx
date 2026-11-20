@@ -9,6 +9,8 @@ export function Sidebar({
   onGeneratePlan,
   isGenerating,
   progress,
+  completedDays,
+  totalPracticeDays,
   level,
 }: {
   language: Language;
@@ -16,6 +18,8 @@ export function Sidebar({
   onGeneratePlan: () => void;
   isGenerating: boolean;
   progress: Progress;
+  completedDays: number;
+  totalPracticeDays: number | null;
   level: string;
 }) {
   return (
@@ -80,12 +84,14 @@ export function Sidebar({
         <p className="mt-2 text-sm text-indigo-200">{level}</p>
         <div className="mt-5 flex justify-between text-sm">
           <span className="text-slate-400">Days completed</span>
-          <b>{progress.completed.length}/30</b>
+          <b>{completedDays}/{totalPracticeDays ?? "—"}</b>
         </div>
         <div className="mt-2 h-2 rounded-full bg-slate-700">
           <div
             className="h-full rounded-full bg-indigo-400"
-            style={{ width: `${(progress.completed.length / 30) * 100}%` }}
+            style={{
+              width: `${totalPracticeDays ? (completedDays / totalPracticeDays) * 100 : 0}%`,
+            }}
           />
         </div>
       </section>

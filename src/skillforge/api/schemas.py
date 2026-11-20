@@ -46,6 +46,8 @@ class CompletionRequest(BaseModel):
     day_number: int = Field(ge=1, le=30)
     completed_day_count: int = Field(ge=1, le=30)
     first_bonus_given: bool
+    total_practice_days: int = Field(ge=1, le=30)
+    final_practice_day: bool = False
 
 
 class LevelRequest(BaseModel):

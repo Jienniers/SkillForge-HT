@@ -57,6 +57,8 @@ export const learningApi = {
     dayNumber: number,
     completedDayCount: number,
     firstBonusGiven: boolean,
+    totalPracticeDays: number,
+    finalPracticeDay: boolean,
   ) =>
     post<{ xp: number; achievement: string | null }>(
       "gamification/completion",
@@ -64,6 +66,8 @@ export const learningApi = {
         day_number: dayNumber,
         completed_day_count: completedDayCount,
         first_bonus_given: firstBonusGiven,
+        total_practice_days: totalPracticeDays,
+        final_practice_day: finalPracticeDay,
       },
     ),
   level: (xp: number) => post<{ level: string }>("gamification/level", { xp }),

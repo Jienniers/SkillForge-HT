@@ -57,6 +57,19 @@ export function useLearning(language: Language, provider: AIProvider) {
       ),
     [practice, selectedDay],
   );
+  const practiceDays = useMemo(
+    () =>
+      Object.entries(practice ?? {})
+        .filter(([, topics]) =>
+          Object.values(topics).some((questions) => questions.length > 0),
+        )
+        .map(([day]) => day),
+    [practice],
+  );
+  const completedPracticeDays = useMemo(
+    () => practiceDays.filter((day) => progress.completed.includes(day)),
+    [practiceDays, progress.completed],
+  );
   const updateProgress = (transform: (current: Progress) => Progress) =>
     setProgress((current) => transform(current));
   function showToast(message: string) {
@@ -139,11 +152,14 @@ export function useLearning(language: Language, provider: AIProvider) {
         );
       const newlyCompleted =
         dayComplete && !progress.completed.includes(selectedDay);
+      const isFinalPracticeDay = practiceDays.at(-1) === selectedDay;
       const completion = newlyCompleted
         ? await learningApi.completion(
             Number(selectedDay.replace("day_", "")),
-            progress.completed.length + 1,
-            progress.completed.length > 0,
+            completedPracticeDays.length + 1,
+            completedPracticeDays.length > 0,
+            practiceDays.length,
+            isFinalPracticeDay,
           )
         : null;
       if (completion) playCompletionSound(completion.achievement);
@@ -243,6 +259,8 @@ export function useLearning(language: Language, provider: AIProvider) {
     selectedDay,
     setSelectedDay,
     progress,
+    completedDays: completedPracticeDays.length,
+    totalPracticeDays: practice ? practiceDays.length : null,
     level,
     busy,
     isGenerating,

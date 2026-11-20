@@ -67,6 +67,8 @@ def completion(request: CompletionRequest) -> dict[str, int | str | None]:
         request.day_number,
         request.completed_day_count,
         request.first_bonus_given,
+        request.total_practice_days,
+        request.final_practice_day,
     )
     return {"xp": reward.xp, "achievement": reward.achievement}
 

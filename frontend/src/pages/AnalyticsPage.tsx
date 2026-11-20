@@ -11,14 +11,20 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 export function AnalyticsPage({
   progress,
+  completedDays,
+  totalPracticeDays,
   level,
   onContinue,
 }: {
   progress: Progress;
+  completedDays: number;
+  totalPracticeDays: number | null;
   level: string;
   onContinue: () => void;
 }) {
-  const percent = Math.round((progress.completed.length / 30) * 100);
+  const percent = totalPracticeDays
+    ? Math.round((completedDays / totalPracticeDays) * 100)
+    : 0;
   return (
     <section className="rounded-2xl border border-slate-700 bg-slate-900 p-7 shadow-sm">
       <h2 className="text-2xl font-bold">Your progress</h2>
@@ -30,7 +36,7 @@ export function AnalyticsPage({
         <Stat label="Current level" value={level} />
         <Stat
           label="Days completed"
-          value={`${progress.completed.length} / 30`}
+          value={`${completedDays} / ${totalPracticeDays ?? "—"}`}
         />
       </div>
       <div className="mt-8">
