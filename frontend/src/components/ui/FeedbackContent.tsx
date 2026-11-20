@@ -2,9 +2,7 @@ import { CodeBlock } from "./CodeBlock";
 import { InlineMarkdown } from "./InlineMarkdown";
 
 export function FeedbackContent({ content }: { content: string }) {
-  const blocks = content
-    .trim()
-    .split(/```([^\n]*)\r?\n([\s\S]*?)```/g);
+  const blocks = content.trim().split(/```([^\n]*)\r?\n([\s\S]*?)```/g);
 
   return (
     <div className="mt-2 space-y-3 leading-6">
@@ -24,7 +22,10 @@ export function FeedbackContent({ content }: { content: string }) {
           .split(/\n{2,}/)
           .filter((paragraph) => paragraph.trim())
           .map((paragraph, paragraphIndex) => (
-            <p key={`text-${index}-${paragraphIndex}`} className="whitespace-pre-wrap">
+            <p
+              key={`text-${index}-${paragraphIndex}`}
+              className="whitespace-pre-wrap"
+            >
               <InlineMarkdown text={paragraph.trim()} />
             </p>
           ));

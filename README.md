@@ -350,7 +350,7 @@ To check the frontend:
 
 ```bash
 npm run lint
-npx prettier --write "{ts,tsx,css}"
+npx prettier --write "frontend/src/**/*.{ts,tsx,css}"
 ```
 
 ---

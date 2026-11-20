@@ -129,9 +129,7 @@ export function PracticePanel({
                         <div
                           className={`mt-3 rounded-lg p-4 text-sm ${isCorrect ? "bg-emerald-500/10 text-emerald-200" : "bg-amber-500/10 text-amber-200"}`}
                         >
-                          <b>
-                            {isCorrect ? "✅ Correct" : "📝 Feedback"}
-                          </b>
+                          <b>{isCorrect ? "✅ Correct" : "📝 Feedback"}</b>
                           {feedback && <FeedbackContent content={feedback} />}
                         </div>
                       )}

@@ -95,13 +95,13 @@ export function RoadmapPage({
                         : "text-slate-300"
                     }
                   >
-                    {topic.toLowerCase() === "rest day"
-                      ? "😴 Rest Day"
-                      : (
-                          <>
-                            ✓ <InlineMarkdown text={topic} />
-                          </>
-                        )}
+                    {topic.toLowerCase() === "rest day" ? (
+                      "😴 Rest Day"
+                    ) : (
+                      <>
+                        ✓ <InlineMarkdown text={topic} />
+                      </>
+                    )}
                   </p>
                 ))}
               </div>
@@ -117,7 +117,11 @@ export function RoadmapPage({
           >
             {isGenerating ? "Generating…" : "🧠 Generate practice questions"}
           </Button>
-          <Button onClick={onGeneratePlan} disabled={isGenerating} className="px-4 py-3">
+          <Button
+            onClick={onGeneratePlan}
+            disabled={isGenerating}
+            className="px-4 py-3"
+          >
             {isGenerating ? "Please wait…" : "Generate a new plan"}
           </Button>
         </div>

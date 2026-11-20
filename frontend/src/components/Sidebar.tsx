@@ -84,7 +84,9 @@ export function Sidebar({
         <p className="mt-2 text-sm text-indigo-200">{level}</p>
         <div className="mt-5 flex justify-between text-sm">
           <span className="text-slate-400">Days completed</span>
-          <b>{completedDays}/{totalPracticeDays ?? "—"}</b>
+          <b>
+            {completedDays}/{totalPracticeDays ?? "—"}
+          </b>
         </div>
         <div className="mt-2 h-2 rounded-full bg-slate-700">
           <div
