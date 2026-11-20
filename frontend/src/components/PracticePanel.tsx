@@ -4,6 +4,7 @@ import { DropdownCard } from "./ui/DropdownCard";
 import type { Language, PracticePlan, Progress } from "../types/learning";
 import { dayName } from "../utils/learning";
 import { FeedbackContent } from "./ui/FeedbackContent";
+import { InlineMarkdown } from "./ui/InlineMarkdown";
 
 export function PracticePanel({
   practice,
@@ -67,7 +68,15 @@ export function PracticePanel({
             📘 {dayName(selectedDay)}
           </h3>
           {Object.entries(topics).map(([topic, list]) => (
-            <DropdownCard key={topic} title={`📌 ${topic}`} className="mt-4">
+            <DropdownCard
+              key={topic}
+              title={
+                <>
+                  📌 <InlineMarkdown text={topic} />
+                </>
+              }
+              className="mt-4"
+            >
               <div className="space-y-6">
                 {list.map((question, index) => {
                   const key = `${selectedDay}-${topic}-${index}`;

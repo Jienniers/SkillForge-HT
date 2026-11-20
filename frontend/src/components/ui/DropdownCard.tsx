@@ -1,7 +1,7 @@
-import { useId, useState, type PropsWithChildren } from "react";
+import { useId, useState, type PropsWithChildren, type ReactNode } from "react";
 
 type DropdownCardProps = PropsWithChildren<{
-  title: string;
+  title: ReactNode;
   defaultOpen?: boolean;
   className?: string;
 }>;
