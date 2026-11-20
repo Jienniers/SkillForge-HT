@@ -1,7 +1,5 @@
 """Type aliases for the JSON-shaped curriculum data."""
 
-from typing import TypeAlias
-
-Roadmap: TypeAlias = dict[str, list[str]]
-PracticeDay: TypeAlias = dict[str, list[str]]
-PracticePlan: TypeAlias = dict[str, PracticeDay]
+type Roadmap = dict[str, list[str]]
+type PracticeDay = dict[str, list[str]]
+type PracticePlan = dict[str, PracticeDay]

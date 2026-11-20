@@ -33,7 +33,12 @@ def can_buy_advanced_hint(xp: int) -> bool:
 
 
 def completion_reward(
-    *, day_number: int, completed_day_count: int, first_bonus_given: bool
+    *,
+    day_number: int,
+    completed_day_count: int,
+    first_bonus_given: bool,
+    total_practice_days: int = DAYS_IN_PLAN,
+    final_practice_day: bool = False,
 ) -> CompletionReward:
     """Determine achievement XP for a newly completed day.
 
@@ -41,6 +46,6 @@ def completion_reward(
     """
     if not first_bonus_given:
         return CompletionReward(FIRST_COMPLETION_BONUS_XP, "first_completion")
-    if day_number == DAYS_IN_PLAN and completed_day_count >= DAYS_IN_PLAN:
+    if final_practice_day and completed_day_count >= total_practice_days:
         return CompletionReward(FINAL_COMPLETION_BONUS_XP, "final_completion")
     return CompletionReward()

@@ -1,1 +1,1 @@
-"""Business and integration services used by the Streamlit application."""
+"""Business and integration services used by the SkillForge API."""

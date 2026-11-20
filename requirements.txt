@@ -1,5 +1,6 @@
 google-genai
 python-dotenv
 reportlab
-streamlit
-streamlit-ace
+fastapi
+uvicorn[standard]
+openai
