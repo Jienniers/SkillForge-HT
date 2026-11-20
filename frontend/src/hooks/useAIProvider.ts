@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
+import { DEFAULT_AI_PROVIDER } from "../config";
 import type { AIProvider } from "../types/provider";
 
 const STORAGE_KEY = "skillforge-ai-provider";
 
 function storedProvider(): AIProvider {
   try {
-    return localStorage.getItem(STORAGE_KEY) === "gemini" ? "gemini" : "local";
+    const savedProvider = localStorage.getItem(STORAGE_KEY);
+    return savedProvider === "local" || savedProvider === "gemini"
+      ? savedProvider
+      : DEFAULT_AI_PROVIDER;
   } catch {
-    return "local";
+    return DEFAULT_AI_PROVIDER;
   }
 }
 

@@ -43,10 +43,10 @@ def test_local_generator_uses_lm_studio_chat_completions(monkeypatch):
     }
 
 
-def test_local_provider_is_the_api_default():
+def test_gemini_provider_is_the_api_default():
     request = RoadmapRequest(language="python")
 
-    assert request.provider == "local"
+    assert request.provider == "gemini"
 
 
 def test_provider_selection_is_passed_to_roadmap_service(monkeypatch):

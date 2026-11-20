@@ -1,6 +1,7 @@
 """Shared user-facing constants and application rules."""
 
 DAYS_IN_PLAN = 30
+DEFAULT_AI_PROVIDER = "gemini"
 QUESTIONS_PER_TOPIC = 3
 QUESTION_XP = 10
 FIRST_COMPLETION_BONUS_XP = 10

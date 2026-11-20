@@ -4,15 +4,17 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from skillforge.constants import DEFAULT_AI_PROVIDER
+
 
 class RoadmapRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
-    provider: Literal["local", "gemini"] = "local"
+    provider: Literal["local", "gemini"] = DEFAULT_AI_PROVIDER
 
 
 class PracticeRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
-    provider: Literal["local", "gemini"] = "local"
+    provider: Literal["local", "gemini"] = DEFAULT_AI_PROVIDER
     roadmap: dict[str, list[str]]
 
 
@@ -22,7 +24,7 @@ class RoadmapPdfRequest(BaseModel):
 
 class EvaluationRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
-    provider: Literal["local", "gemini"] = "local"
+    provider: Literal["local", "gemini"] = DEFAULT_AI_PROVIDER
     question: str = Field(min_length=1)
     code: str = Field(min_length=1)
 
@@ -35,7 +37,7 @@ class EvaluationResponse(BaseModel):
 
 class HintRequest(BaseModel):
     language: Literal["python", "javascript", "java", "c++", "go"]
-    provider: Literal["local", "gemini"] = "local"
+    provider: Literal["local", "gemini"] = DEFAULT_AI_PROVIDER
     question: str = Field(min_length=1)
     level: Literal[1, 2]
     xp: int = Field(ge=0, default=0)

@@ -83,8 +83,8 @@ Python runs the backend API and business logic. It validates requests and genera
 
 The AI provider can be selected on the **Settings** page. The choice is saved in browser local storage and sent with AI requests.
 
-- **Local AI (default):** Uses an OpenAI-compatible endpoint. LM Studio can provide this endpoint; start its local server and load the configured model before generating content.
-- **Gemini:** Uses the Google Gemini API key configured for the Python backend.
+- **Gemini (default):** Uses the Google Gemini API key configured for the Python backend.
+- **Local AI:** Uses an OpenAI-compatible endpoint. LM Studio can provide this endpoint; start its local server and load the configured model before generating content.
 
 Default configuration:
 
@@ -94,6 +94,8 @@ Default configuration:
 | `LOCAL_AI_MODEL`    | `qwen2.5-coder-7b-instruct` | Local model name                                 |
 | `GEMINI_API_KEY`    | —                           | Gemini API key; required when Gemini is selected |
 | `GEMINI_MODEL`      | `gemini-2.5-flash`          | Gemini model name                                |
+
+To change the default provider for new users, update `DEFAULT_AI_PROVIDER` in `frontend/src/config.ts` and `src/skillforge/constants.py`. A provider already saved in a browser remains selected until the user changes it in Settings or clears that preference.
 
 ---
 
@@ -255,9 +257,7 @@ pip install -r requirements.txt
 
 #### 2. Configure AI settings
 
-Local AI is the default. Start LM Studio’s local server at `http://localhost:1234` and load the model configured by `LOCAL_AI_MODEL`.
-
-To use Gemini, create a `.env` file in the repository root:
+Gemini is the default provider. Add `GEMINI_API_KEY` to the root `.env` file before generating content with Gemini. Alternatively, select **Local (LM Studio)** on the Settings page; start LM Studio’s local server at `http://localhost:1234` and load the model configured by `LOCAL_AI_MODEL`.
 
 ```env
 GEMINI_API_KEY=your_api_key_here
@@ -317,7 +317,7 @@ When `frontend/dist` exists, FastAPI serves the built frontend and API from `htt
 
 ### Option 3 — Run with Docker
 
-Create a root `.env` file before starting Compose. You can leave it empty when using the default local provider. Add the Gemini key if you plan to select Gemini:
+Create a root `.env` file before starting Compose. Add `GEMINI_API_KEY` to use the default Gemini provider:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
@@ -358,7 +358,7 @@ npx prettier --write "frontend/src/**/*.{ts,tsx,css}"
 ## ⚠️ Important Notes
 
 - AI generation requires either a reachable local model server or a valid Gemini API key, depending on the provider selected in Settings.
-- Local AI is the default provider. LM Studio must be running with the configured model loaded.
+- Gemini is the default provider and requires `GEMINI_API_KEY`. LM Studio must be running with the configured model loaded when Local is selected.
 - Gemini credentials are read by the Python backend from `GEMINI_API_KEY` in the environment or root `.env` file.
 - The selected theme, AI provider, answers, hints, XP, and learning progress are stored in browser local storage.
 - Generated roadmap and practice data are held in the running frontend session; generating a new roadmap resets learning progress.

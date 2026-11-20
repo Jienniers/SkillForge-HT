@@ -1,7 +1,7 @@
 """Application use cases that connect API requests to Gemini and domain logic."""
 
 from skillforge.config import Settings
-from skillforge.constants import ADVANCED_HINT_COST_XP, QUESTION_XP
+from skillforge.constants import ADVANCED_HINT_COST_XP, DEFAULT_AI_PROVIDER, QUESTION_XP
 from skillforge.models import PracticePlan, Roadmap
 from skillforge.services.gamification import can_buy_advanced_hint, completion_reward, level_for_xp
 from skillforge.services.gemini import GeminiGenerator
@@ -15,7 +15,7 @@ from skillforge.services.local_ai import LocalAITextGenerator
 from skillforge.services.validation import validate_roadmap
 
 
-def _generator(provider: str = "local"):
+def _generator(provider: str = DEFAULT_AI_PROVIDER):
     settings = Settings.from_environment()
     if provider == "gemini":
         return GeminiGenerator(settings)
@@ -24,18 +24,20 @@ def _generator(provider: str = "local"):
     raise ValueError(f"Unsupported AI provider: {provider}")
 
 
-def generate_roadmap_for(language: str, provider: str = "local") -> Roadmap:
+def generate_roadmap_for(language: str, provider: str = DEFAULT_AI_PROVIDER) -> Roadmap:
     return create_roadmap(_generator(provider), language)
 
 
-def generate_practice_for(language: str, roadmap: Roadmap, provider: str = "local") -> PracticePlan:
+def generate_practice_for(
+    language: str, roadmap: Roadmap, provider: str = DEFAULT_AI_PROVIDER
+) -> PracticePlan:
     validate_roadmap(roadmap)
     del language  # The generated curriculum already contains its language-specific context.
     return create_practice_plan(_generator(provider), roadmap)
 
 
 def evaluate(
-    question: str, code: str, language: str, provider: str = "local"
+    question: str, code: str, language: str, provider: str = DEFAULT_AI_PROVIDER
 ) -> tuple[str, bool, int]:
     feedback = evaluate_answer(_generator(provider), question, code, language)
     correct = "✅ Correct" in feedback
@@ -48,7 +50,7 @@ def generate_hint_for(
     level: int,
     xp: int,
     already_charged: bool,
-    provider: str = "local",
+    provider: str = DEFAULT_AI_PROVIDER,
 ) -> tuple[str, int]:
     cost = ADVANCED_HINT_COST_XP if level == 2 and not already_charged else 0
     if cost and not can_buy_advanced_hint(xp):
