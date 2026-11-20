@@ -3,6 +3,7 @@ import { Select } from "./ui/Select";
 import { DropdownCard } from "./ui/DropdownCard";
 import type { Language, PracticePlan, Progress } from "../types/learning";
 import { dayName } from "../utils/learning";
+import { FeedbackContent } from "./ui/FeedbackContent";
 
 export function PracticePanel({
   practice,
@@ -122,9 +123,7 @@ export function PracticePanel({
                           <b>
                             {isCorrect ? "✅ Correct" : "📝 Feedback"}
                           </b>
-                          {feedback && (
-                            <p className="mt-1 whitespace-pre-wrap">{feedback}</p>
-                          )}
+                          {feedback && <FeedbackContent content={feedback} />}
                         </div>
                       )}
                     </article>
