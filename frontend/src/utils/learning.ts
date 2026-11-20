@@ -23,9 +23,9 @@ export function saveProgress(progress: Progress) {
   localStorage.setItem("skillforge-progress", JSON.stringify(progress));
 }
 export function playCompletionSound(achievement: string | null) {
-  if (achievement === "final_completion") return;
+  if (!achievement) return;
   const sound =
-    achievement === "first_completion"
+    achievement === "first_completion" || achievement === "final_completion"
       ? "AchievementSound.mp3"
       : "DayCompleteSound.mp3";
   void new Audio(`/sounds/${sound}`).play().catch(() => undefined);
