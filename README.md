@@ -4,7 +4,7 @@
 
 ## 📌 Short Description
 
-SkillForge is an interactive AI-powered coding practice platform built with Streamlit. It generates a personalized 30-day learning roadmap, provides coding practice questions, and evaluates user answers using Google Gemini 2.5 Flash.
+SkillForge is an interactive coding practice platform with a React + TypeScript frontend and a Python FastAPI backend. It creates a personalized 30-day learning roadmap, generates practice questions, evaluates submitted answers, and tracks progress in the browser. AI generation can use a local OpenAI-compatible model through LM Studio or Google Gemini.
 
 ---
 
@@ -12,11 +12,9 @@ SkillForge is an interactive AI-powered coding practice platform built with Stre
 
 ### ⚠️ Note
 
-SkillForge uses Large Language Models (LLMs) to dynamically generate personalized learning roadmaps, practice questions, hints, and code evaluation feedback.
+SkillForge uses large language models to dynamically generate personalized learning roadmaps, practice questions, hints, and code evaluation feedback.
 
-Because the content is generated in real time, some actions (such as roadmap generation and practice question generation) may take a few seconds to complete. This is expected behavior while the AI processes your request.
-
-Please be patient during generation and avoid repeatedly clicking buttons while content is being created.
+Because content is generated in real time, actions such as roadmap generation and practice question generation may take a few seconds. Avoid repeatedly clicking generation buttons while a request is in progress.
 
 ### 🔗 Demo Access
 
@@ -30,60 +28,72 @@ The full source code and setup instructions are still available in this reposito
 
 ## 🧠 What This Project Does
 
-SkillForge transforms a static learning roadmap into an interactive coding experience:
+SkillForge turns a learning roadmap into an interactive coding experience:
 
-- Users select a programming language (Python, JavaScript, Java, C++, Go)
-- The system generates a **30-day structured learning plan**
-- Each day contains topics and coding exercises
-- Users solve coding problems directly in the browser using an embedded editor
-- AI evaluates answers and returns:
-  - Correct / Incorrect feedback
-  - Explanation and fix suggestions
-- Users earn **XP points** for correct answers
-- A gamified system tracks:
-  - Completed days
-  - Progress across the 30-day roadmap
-- Users can request:
-  - AI-generated practice questions per day
-  - Hints (with XP penalty for advanced hints)
-- A downloadable **PDF roadmap** is generated for offline use
+- Choose Python, JavaScript, Java, C++, or Go.
+- Generate a structured 30-day roadmap and day-by-day practice questions.
+- Answer coding questions in the browser and receive AI feedback with explanations and suggested fixes.
+- Request hints. Hint 2 costs 5 XP once per question.
+- Earn XP for correct answers and complete practical days.
+- Track completed practical days, XP, and level progression. Theory-only days do not count toward the completed-day total.
+- Download the roadmap as a PDF.
+- Switch between local LM Studio generation and Gemini in Settings.
 
 ---
 
-## 🐍 How Python is Used
+## 🧱 Application Architecture
 
-Python is the core engine of SkillForge:
+The project is split into a React frontend and a Python API backend:
 
-### 🔹 Backend Logic
+### React frontend (`frontend/`)
 
-- Handles roadmap generation and transformation
-- Parses and validates AI-generated JSON responses
-- Manages user progress and scoring logic
+- React, TypeScript, Vite, and Tailwind CSS provide the browser UI.
+- React Router manages the **Roadmap**, **Progress**, and **Settings** pages.
+- Reusable components handle navigation, dropdowns, practice questions, feedback, and notifications.
+- The selected theme and AI provider are saved in browser local storage. Learning progress, answers, hints, and XP are also saved in local storage.
 
-### 🔹 Streamlit UI
+### Python backend (`src/`)
 
-- Builds interactive web interface
-- Uses buttons, selectboxes, expanders, and layout columns
-- Displays real-time feedback and progress updates
+- FastAPI exposes the `/api` endpoints consumed by the frontend.
+- `src/skillforge/api/` contains the request schemas and route handlers.
+- `src/skillforge/services/` contains AI generation, validation, PDF creation, and gamification logic.
+- `src/skillforge/config.py` loads backend settings from environment variables and the root `.env` file.
 
-### 🔹 Session State Management
+The frontend sends JSON requests to the backend. In development, Vite proxies `/api` requests to `http://localhost:8000`. In a production build, FastAPI serves the built frontend from `frontend/dist` when that directory exists.
 
-- `st.session_state` is used to persist:
-  - XP system
-  - Completed days
-  - Practice question results
-  - Generated roadmap
-  - Achievements and hints
+### API routes
 
-### 🔹 AI Integration
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/roadmap` | Generate a roadmap |
+| `POST` | `/api/practice` | Generate practice questions for the roadmap |
+| `POST` | `/api/evaluate` | Evaluate a submitted answer |
+| `POST` | `/api/hint` | Generate a hint |
+| `POST` | `/api/gamification/completion` | Calculate day completion rewards |
+| `POST` | `/api/gamification/level` | Get the level for an XP total |
+| `POST` | `/api/roadmap/pdf` | Create a downloadable roadmap PDF |
 
-- Uses the **Google Gemini API**
-- Model used: **Gemini 2.5 Flash**
-- Responsible for:
-  - Roadmap generation
-  - Code evaluation
-  - Hint generation
-  - Practice question creation
+---
+
+## 🐍 How Python Is Used
+
+Python runs the backend API and business logic. It validates requests and generated plans, calls the selected AI provider, evaluates answers, calculates XP and achievements, and creates roadmap PDFs. The browser UI and browser-stored user progress are handled by the React frontend.
+
+### 🤖 AI Providers
+
+The AI provider can be selected on the **Settings** page. The choice is saved in browser local storage and sent with AI requests.
+
+- **Local AI (default):** Uses an OpenAI-compatible endpoint. LM Studio can provide this endpoint; start its local server and load the configured model before generating content.
+- **Gemini:** Uses the Google Gemini API key configured for the Python backend.
+
+Default configuration:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `LOCAL_AI_BASE_URL` | `http://localhost:1234/v1` | OpenAI-compatible local API URL |
+| `LOCAL_AI_MODEL` | `qwen2.5-coder-7b-instruct` | Local model name |
+| `GEMINI_API_KEY` | — | Gemini API key; required when Gemini is selected |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Gemini model name |
 
 ---
 
@@ -112,19 +122,15 @@ Most importantly, I discovered how powerful Streamlit can be for rapidly turning
 
 ### 🤖 Prompt Engineering & LLM Reliability
 
-This project relies on **Google Gemini 2.5 Flash** for generating structured learning plans, practice questions, code evaluation, and hints.
-
-To ensure consistent and reliable outputs, significant prompt engineering was required. The model was guided using strict system prompts that enforce:
+This project uses structured prompts for AI-generated learning plans, practice questions, answer evaluation, and hints. The prompts and Python validation logic are designed to encourage:
 
 - Structured JSON outputs for roadmap and practice generation
-- Strict language consistency based on selected programming language
-- Controlled difficulty progression (beginner → advanced)
-- Anti-hallucination constraints to prevent introduction of external topics
-- Validation-friendly response formats for downstream parsing in Python
+- Consistent use of the selected programming language
+- A progression from beginner to advanced topics
+- Curriculum topics that stay within the requested learning plan
+- Response formats that the backend can parse and validate
 
-Additionally, fallback parsing and retry mechanisms were implemented to handle occasional malformed outputs and ensure robustness in production usage.
-
-This approach allowed the LLM to behave like a structured curriculum engine rather than a free-form text generator.
+Practice generation retries invalid responses before returning an error. The backend supports both the local OpenAI-compatible provider and Gemini, selected by the frontend for each request.
 
 ---
 
@@ -142,160 +148,232 @@ This approach allowed the LLM to behave like a structured curriculum engine rath
 
 ### 🎯 AI-Generated Learning Roadmap
 
-- Generates a structured 30-day coding plan per language
+- Generates a structured 30-day coding plan for the selected language.
+- Presents day content in expandable dropdowns.
 
-### 💻 Interactive Coding Environment
+### 💻 Interactive Coding Practice
 
-- Built-in code editor using `streamlit-ace`
+- Generates questions for roadmap topics.
+- Accepts code answers in the browser and shows formatted evaluation feedback.
 
 ### 🤖 AI Code Evaluation
 
-- Checks correctness of user solutions using Gemini 2.5 Flash
+- Checks submitted solutions using the configured AI provider.
+- Returns correctness, explanation, and suggested fixes.
 
 ### 🧠 Practice Question Generator
 
-- Generates structured coding exercises per day/topic
+- Generates practical coding exercises for each day and topic.
+- Theory-only days remain available in the plan and are excluded from practical-day completion progress.
 
 ### 💡 Hint System
 
-- Multi-level AI hints
-- XP penalty system for advanced hints
+- Provides two levels of AI-generated hints.
+- Hint 2 costs 5 XP once per question.
 
 ### 🏆 Gamification System
 
-- XP points for correct answers
-- Day completion tracking
-- Achievement triggers (first completion and final day)
+- Awards XP for correct answers and completion achievements.
+- Plays completion sounds for day and achievement milestones.
 
-### 📊 Progress Tracking
+### 📊 Progress Page
 
-- Tracks completed days
-- Displays XP level progression
+- Shows XP, current level, and completed practical days.
+- Calculates the total from days in the generated practice plan that contain questions.
+
+### ⚙️ Settings Page
+
+- Switches between dark and light themes.
+- Selects the local AI or Gemini provider.
+- Saves theme and provider preferences in browser local storage.
 
 ### 📄 PDF Export
 
-- Generates downloadable roadmap PDF using ReportLab
+- Generates and downloads a PDF copy of the roadmap.
 
 ---
 
 ### 🏆 XP Rewards
 
-| Action                                                            |           XP |
-| ----------------------------------------------------------------- | -----------: |
-| Correctly solve a coding question                                 |       +10 XP |
-| Complete the first practice day (First Completion Achievement)    | +10 XP Bonus |
-| Complete Day 30 as the 30th completed day (Final Day Achievement) | +50 XP Bonus |
+| Action | XP |
+| --- | ---: |
+| Correctly solve a coding question | +10 XP |
+| Complete the first practical day | +10 XP bonus |
+| Complete all practical days in the plan | +50 XP bonus |
 
 ### 💡 XP Costs
 
-| Action                                        | XP Cost |
-| --------------------------------------------- | ------: |
-| Use Hint 2 (Advanced Hint, once per question) |   -5 XP |
+| Action | XP Cost |
+| --- | ---: |
+| Use Hint 2 (once per question) | -5 XP |
 
 ### 📈 Level Progression
 
-| Level                |  XP Required |
-| -------------------- | -----------: |
-| 🌱 Beginner          |    0 - 99 XP |
-| ⚡ Apprentice        | 100 - 299 XP |
-| 🔥 Intermediate      | 300 - 599 XP |
-| 🚀 Advanced          | 600 - 999 XP |
-| 👑 SkillForge Master |     1000+ XP |
+| Level | XP Required |
+| --- | ---: |
+| 🌱 Beginner | 0–99 XP |
+| ⚡ Apprentice | 100–299 XP |
+| 🔥 Intermediate | 300–599 XP |
+| 🚀 Advanced | 600–999 XP |
+| 👑 SkillForge Master | 1000+ XP |
 
 ### 🎯 Progress Tracking
 
-Users earn XP by solving coding challenges and completing roadmap milestones. Progress is tracked throughout the learning journey and reflected in the sidebar dashboard, which displays:
-
-- Current XP
-- Current Level
-- Days Completed
-- Overall Roadmap Progress
+Learning progress, answers, hints, and XP are saved in the browser’s local storage. Completed-day progress counts practical days with questions, so a plan’s maximum can be lower than 30 when it includes theory-only days. SkillForge does not currently use a database for user progress.
 
 ---
 
 ## ▶️ How to Run
 
-### Option 1 — Run Locally
+### Requirements
 
-#### 1. Clone the repository
+- Python 3.12 or newer
+- Node.js 24 (also used by the frontend Docker build)
+- LM Studio with a compatible model and its local server running, or a Gemini API key
+
+### Option 1 — Run in Development
+
+#### 1. Install Python dependencies
+
+From the repository root:
 
 ```bash
-git clone https://github.com/<your-username>/SkillForge.git
-cd SkillForge
+python -m venv .venv
 ```
 
-SkillForge requires Python 3.12 or newer.
-
-#### 2. Install dependencies
+Activate the environment, then install dependencies:
 
 ```bash
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
+# macOS/Linux
+source .venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-#### 3. Create a `.env` file
+#### 2. Configure AI settings
+
+Local AI is the default. Start LM Studio’s local server at `http://localhost:1234` and load the model configured by `LOCAL_AI_MODEL`.
+
+To use Gemini, create a `.env` file in the repository root:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
 ```
 
-#### 4. Start the Streamlit app
+Optional settings can also be added to `.env`:
+
+```env
+GEMINI_MODEL=gemini-2.5-flash
+LOCAL_AI_BASE_URL=http://localhost:1234/v1
+LOCAL_AI_MODEL=qwen2.5-coder-7b-instruct
+```
+
+#### 3. Install frontend dependencies
 
 ```bash
-streamlit run src/main.py
+cd frontend
+npm install
 ```
 
----
+#### 4. Start the backend and frontend
 
-### Option 2 — Run with Docker (Recommended)
+Open two terminals at the repository root.
 
-#### 1. Create a `.env` file
+Terminal 1 — Python API:
+
+```bash
+uvicorn main:app --app-dir src --reload --host 127.0.0.1 --port 8000
+```
+
+Terminal 2 — React development server:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Open the Vite URL shown in the terminal (usually `http://localhost:5173`). Vite forwards API requests to the backend at `http://localhost:8000`.
+
+### Option 2 — Build and run the application
+
+Build the frontend:
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+From the repository root, start FastAPI:
+
+```bash
+uvicorn main:app --app-dir src --host 127.0.0.1 --port 8000
+```
+
+When `frontend/dist` exists, FastAPI serves the built frontend and API from `http://localhost:8000`.
+
+### Option 3 — Run with Docker
+
+Create a root `.env` file before starting Compose. You can leave it empty when using the default local provider. Add the Gemini key if you plan to select Gemini:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
 ```
 
-#### 2. Build and start the application
+Then build and start the application:
 
 ```bash
 docker compose up --build
 ```
 
-The application will be available at:
+The app and API will be available at `http://localhost:8000`.
 
-```
-http://localhost:8501
-```
+If you want a Dockerized backend to access LM Studio running on the host computer, set `LOCAL_AI_BASE_URL` to `http://host.docker.internal:1234/v1` in `.env` and make sure the LM Studio server accepts connections from Docker.
 
 ---
 
 ## 🧪 Testing & Code Quality
 
-The offline unit tests do not call Gemini. Install the optional development tools, then run the checks from the project root:
+The backend unit tests do not call an AI provider. From the repository root, install the development tools and run the checks:
 
 ```bash
 pip install pytest ruff
 pytest
-ruff check .
+ruff check src tests
+```
+
+To check the frontend:
+
+```bash
+cd frontend
+npm install
+npm run lint
+npm run build
 ```
 
 ---
 
 ## ⚠️ Important Notes
 
-- This project uses the **Google Gemini API (Gemini 2.5 Flash)** for AI-powered features.
-- A valid `GEMINI_API_KEY` is required to run the application.
-- Session state is heavily used for persistence
-- All progress is stored only during runtime (no database yet)
+- AI generation requires either a reachable local model server or a valid Gemini API key, depending on the provider selected in Settings.
+- Local AI is the default provider. LM Studio must be running with the configured model loaded.
+- Gemini credentials are read by the Python backend from `GEMINI_API_KEY` in the environment or root `.env` file.
+- The selected theme, AI provider, answers, hints, XP, and learning progress are stored in browser local storage.
+- Generated roadmap and practice data are held in the running frontend session; generating a new roadmap resets learning progress.
+- There is no user account or database-backed progress sync.
 
 ---
 
 ## 🏆 Project Highlights
 
-- Fully AI-driven learning system
-- Gamified coding practice environment
-- Powered by Google Gemini 2.5 Flash
-- Real-time evaluation + feedback loop
-- 30-day structured learning system
+- React + TypeScript frontend with a Python FastAPI backend
+- Local LM Studio and Gemini AI provider options
+- AI-generated learning plans, practice questions, feedback, and hints
+- Progress, theme, and AI provider preferences stored in the browser
+- Practical-day completion tracking, gamification, and roadmap PDF export
 
 ---
 
