@@ -18,6 +18,7 @@ export function RoadmapPage({
   progress,
   onGeneratePlan,
   onGeneratePractice,
+  isGenerating,
   onDownloadPdf,
   onAnswer,
   onCheck,
@@ -31,6 +32,7 @@ export function RoadmapPage({
   progress: Progress;
   onGeneratePlan: () => void;
   onGeneratePractice: () => void;
+  isGenerating: boolean;
   onDownloadPdf: () => void;
   onAnswer: (key: string, value: string) => void;
   onCheck: (key: string, question: string) => void;
@@ -55,9 +57,10 @@ export function RoadmapPage({
         <Button
           variant="primary"
           onClick={onGeneratePlan}
+          disabled={isGenerating}
           className="mt-6 rounded-xl px-5 py-3"
         >
-          Generate my {language} plan →
+          {isGenerating ? "Please wait…" : `Generate my ${language} plan →`}
         </Button>
       </section>
     );
@@ -104,12 +107,13 @@ export function RoadmapPage({
           <Button
             variant="primary"
             onClick={onGeneratePractice}
+            disabled={isGenerating}
             className="px-4 py-3"
           >
-            🧠 Generate practice questions
+            {isGenerating ? "Generating…" : "🧠 Generate practice questions"}
           </Button>
-          <Button onClick={onGeneratePlan} className="px-4 py-3">
-            Generate a new plan
+          <Button onClick={onGeneratePlan} disabled={isGenerating} className="px-4 py-3">
+            {isGenerating ? "Please wait…" : "Generate a new plan"}
           </Button>
         </div>
       </section>

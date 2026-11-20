@@ -34,6 +34,7 @@ function Application() {
         language={language}
         onLanguageChange={setLanguage}
         onGeneratePlan={learning.generatePlan}
+        isGenerating={learning.isGenerating}
         progress={learning.progress}
         level={learning.level}
       />
@@ -76,6 +77,7 @@ function Application() {
                   progress={learning.progress}
                   onGeneratePlan={learning.generatePlan}
                   onGeneratePractice={learning.generatePractice}
+                  isGenerating={learning.isGenerating}
                   onDownloadPdf={learning.downloadPdf}
                   onAnswer={learning.updateAnswer}
                   onCheck={learning.checkAnswer}

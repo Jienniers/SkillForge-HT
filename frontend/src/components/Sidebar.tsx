@@ -7,12 +7,14 @@ export function Sidebar({
   language,
   onLanguageChange,
   onGeneratePlan,
+  isGenerating,
   progress,
   level,
 }: {
   language: Language;
   onLanguageChange: (language: Language) => void;
   onGeneratePlan: () => void;
+  isGenerating: boolean;
   progress: Progress;
   level: string;
 }) {
@@ -45,9 +47,10 @@ export function Sidebar({
         <Button
           variant="primary"
           onClick={onGeneratePlan}
+          disabled={isGenerating}
           className="mt-3 w-full bg-indigo-500 py-3"
         >
-          Generate plan
+          {isGenerating ? "Please wait…" : "Generate plan"}
         </Button>
       </div>
       <nav className="mb-6 flex gap-2 md:block md:space-y-2">

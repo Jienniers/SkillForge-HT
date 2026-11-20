@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { learningApi } from "../services/learningApi";
 import type { AIProvider } from "../types/provider";
 import {
@@ -21,7 +21,9 @@ export function useLearning(language: Language, provider: AIProvider) {
   const [progress, setProgress] = useState<Progress>(readProgress);
   const [level, setLevel] = useState("");
   const [busy, setBusy] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const [notice, setNotice] = useState("");
+  const generationInFlight = useRef(false);
   useEffect(() => saveProgress(progress), [progress]);
   useEffect(() => {
     let current = true;
@@ -51,6 +53,9 @@ export function useLearning(language: Language, provider: AIProvider) {
     setProgress((current) => transform(current));
 
   async function generatePlan() {
+    if (generationInFlight.current) return;
+    generationInFlight.current = true;
+    setIsGenerating(true);
     setBusy("Generating your roadmap…");
     setNotice("");
     try {
@@ -65,11 +70,15 @@ export function useLearning(language: Language, provider: AIProvider) {
           : "Could not generate your roadmap.",
       );
     } finally {
+      generationInFlight.current = false;
+      setIsGenerating(false);
       setBusy("");
     }
   }
   async function generatePractice() {
-    if (!roadmap) return;
+    if (!roadmap || generationInFlight.current) return;
+    generationInFlight.current = true;
+    setIsGenerating(true);
     setBusy("Generating practice questions…");
     setNotice("");
     try {
@@ -81,6 +90,8 @@ export function useLearning(language: Language, provider: AIProvider) {
           : "Could not generate practice questions.",
       );
     } finally {
+      generationInFlight.current = false;
+      setIsGenerating(false);
       setBusy("");
     }
   }
@@ -211,6 +222,7 @@ export function useLearning(language: Language, provider: AIProvider) {
     progress,
     level,
     busy,
+    isGenerating,
     notice,
     setNotice,
     currentQuestions,
