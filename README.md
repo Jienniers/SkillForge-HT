@@ -63,15 +63,15 @@ The frontend sends JSON requests to the backend. In development, Vite proxies `/
 
 ### API routes
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/roadmap` | Generate a roadmap |
-| `POST` | `/api/practice` | Generate practice questions for the roadmap |
-| `POST` | `/api/evaluate` | Evaluate a submitted answer |
-| `POST` | `/api/hint` | Generate a hint |
-| `POST` | `/api/gamification/completion` | Calculate day completion rewards |
-| `POST` | `/api/gamification/level` | Get the level for an XP total |
-| `POST` | `/api/roadmap/pdf` | Create a downloadable roadmap PDF |
+| Method | Route                          | Purpose                                     |
+| ------ | ------------------------------ | ------------------------------------------- |
+| `POST` | `/api/roadmap`                 | Generate a roadmap                          |
+| `POST` | `/api/practice`                | Generate practice questions for the roadmap |
+| `POST` | `/api/evaluate`                | Evaluate a submitted answer                 |
+| `POST` | `/api/hint`                    | Generate a hint                             |
+| `POST` | `/api/gamification/completion` | Calculate day completion rewards            |
+| `POST` | `/api/gamification/level`      | Get the level for an XP total               |
+| `POST` | `/api/roadmap/pdf`             | Create a downloadable roadmap PDF           |
 
 ---
 
@@ -88,12 +88,12 @@ The AI provider can be selected on the **Settings** page. The choice is saved in
 
 Default configuration:
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `LOCAL_AI_BASE_URL` | `http://localhost:1234/v1` | OpenAI-compatible local API URL |
-| `LOCAL_AI_MODEL` | `qwen2.5-coder-7b-instruct` | Local model name |
-| `GEMINI_API_KEY` | — | Gemini API key; required when Gemini is selected |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Gemini model name |
+| Variable            | Default                     | Purpose                                          |
+| ------------------- | --------------------------- | ------------------------------------------------ |
+| `LOCAL_AI_BASE_URL` | `http://localhost:1234/v1`  | OpenAI-compatible local API URL                  |
+| `LOCAL_AI_MODEL`    | `qwen2.5-coder-7b-instruct` | Local model name                                 |
+| `GEMINI_API_KEY`    | —                           | Gemini API key; required when Gemini is selected |
+| `GEMINI_MODEL`      | `gemini-2.5-flash`          | Gemini model name                                |
 
 ---
 
@@ -195,27 +195,27 @@ Practice generation retries invalid responses before returning an error. The bac
 
 ### 🏆 XP Rewards
 
-| Action | XP |
-| --- | ---: |
-| Correctly solve a coding question | +10 XP |
-| Complete the first practical day | +10 XP bonus |
+| Action                                  |           XP |
+| --------------------------------------- | -----------: |
+| Correctly solve a coding question       |       +10 XP |
+| Complete the first practical day        | +10 XP bonus |
 | Complete all practical days in the plan | +50 XP bonus |
 
 ### 💡 XP Costs
 
-| Action | XP Cost |
-| --- | ---: |
-| Use Hint 2 (once per question) | -5 XP |
+| Action                         | XP Cost |
+| ------------------------------ | ------: |
+| Use Hint 2 (once per question) |   -5 XP |
 
 ### 📈 Level Progression
 
-| Level | XP Required |
-| --- | ---: |
-| 🌱 Beginner | 0–99 XP |
-| ⚡ Apprentice | 100–299 XP |
-| 🔥 Intermediate | 300–599 XP |
-| 🚀 Advanced | 600–999 XP |
-| 👑 SkillForge Master | 1000+ XP |
+| Level                | XP Required |
+| -------------------- | ----------: |
+| 🌱 Beginner          |     0–99 XP |
+| ⚡ Apprentice        |  100–299 XP |
+| 🔥 Intermediate      |  300–599 XP |
+| 🚀 Advanced          |  600–999 XP |
+| 👑 SkillForge Master |    1000+ XP |
 
 ### 🎯 Progress Tracking
 
@@ -340,18 +340,17 @@ If you want a Dockerized backend to access LM Studio running on the host compute
 The backend unit tests do not call an AI provider. From the repository root, install the development tools and run the checks:
 
 ```bash
-pip install pytest ruff
-pytest
-ruff check src tests
+pip install ruff
+ruff format .
+ruff check --fix .
+ruff check .
 ```
 
 To check the frontend:
 
 ```bash
-cd frontend
-npm install
 npm run lint
-npm run build
+npx prettier --write "{ts,tsx,css}"
 ```
 
 ---
