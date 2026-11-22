@@ -1,4 +1,8 @@
-# 🚀 SkillForge – AI Powered 30-Day Coding Learning Platform
+<p align="center">
+  <img src="frontend/public/favicon.svg" alt="SkillForge logo" width="120" />
+</p>
+
+# SkillForge – AI Powered 30-Day Coding Learning Platform
 
 ---
 
