@@ -99,7 +99,7 @@ Default configuration:
 | `GEMINI_API_KEY`    | —                           | Gemini API key; required when Gemini is selected |
 | `GEMINI_MODEL`      | `gemini-2.5-flash`          | Gemini model name                                |
 
-To change the default provider for new users, update `DEFAULT_AI_PROVIDER` in `frontend/src/config.ts` and `src/skillforge/constants.py`. A provider already saved in a browser remains selected until the user changes it in Settings or clears that preference.
+To change the defaults for new users, update `DEFAULT_AI_PROVIDER` and `DEFAULT_THEME` in `frontend/src/config.ts`, and `DEFAULT_AI_PROVIDER` in `src/skillforge/constants.py`. Preferences already saved in a browser remain selected until users change them in Settings or clear those preferences.
 
 ---
 

@@ -1,13 +1,17 @@
 import { useLayoutEffect, useState } from "react";
+import { DEFAULT_THEME } from "../config";
 import type { Theme } from "../types/theme";
 
 const STORAGE_KEY = "skillforge-theme";
 
 function storedTheme(): Theme {
   try {
-    return localStorage.getItem(STORAGE_KEY) === "light" ? "light" : "dark";
+    const savedTheme = localStorage.getItem(STORAGE_KEY);
+    return savedTheme === "light" || savedTheme === "dark"
+      ? savedTheme
+      : DEFAULT_THEME;
   } catch {
-    return "dark";
+    return DEFAULT_THEME;
   }
 }
 
